@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="gu">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+<title>What A App</title>
+<style>
+:root{
+  --bg:#f0f2f5; --panel:#ffffff; --text:#111; --muted:#667;
+  --accent:#25D366; --accent-dark:#128C7E;
+  --bubble-me:#d9fdd3; --bubble-them:#ffffff;
+  --border:#e5e7eb; --danger:#e53935;
+}
+.dark{
+  --bg:#0b141a; --panel:#111b21; --text:#e9edef; --muted:#aebac1;
+  --bubble-me:#005c4b; --bubble-them:#202c33; --border:#1f2c34;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,"Noto Sans Gujarati","Noto Sans",sans-serif}
+
+/* Splash */
+#splash{
+  position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  background:#25D366;color:#fff;z-index:9999;opacity:1;transition:opacity .8s ease;
+}
+#splash.fade{opacity:0;pointer-events:none;}
+#splash .logo{display:flex;align-items:center;gap:12px;margin-bottom:20px;}
+#splash .logo-circle{width:80px;height:80px;border-radius:50%;background:#fff;color:#25D366;font-weight:700;
+  display:flex;align-items:center;justify-content:center;font-size:2rem;box-shadow:0 4px 12px rgba(0,0,0,.3);}
+#splash .logo-text{font-size:2rem;font-weight:700;color:#fff;}
+.loading{display:flex;gap:8px;}
+.loading .dot{width:10px;height:10px;border-radius:50%;background:#fff;animation:blink 1.2s infinite;}
+.loading .dot:nth-child(2){animation-delay:.2s}
+.loading .dot:nth-child(3){animation-delay:.4s}
+@keyframes blink{0%{opacity:.2}50%{opacity:1}100%{opacity:.2}}
+
+/* App shell */
+.app{display:flex;flex-direction:column;height:100vh;}
+.content{flex:1;display:grid;grid-template-columns:360px 1fr;min-height:0;}
+@media(max-width:900px){.content{grid-template-columns:1fr;}}
+
+.panel{background:var(--panel);border-right:1px solid var(--border);min-height:0;}
+.panel:last-child{border-right:none}
+
+/* Topbar */
+.topbar{display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid var(--border);
+  position:sticky;top:0;background:var(--panel);z-index:10;}
+.avatar{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:700;background:#128C7E;}
+.title{font-weight:700;}
+.spacer{flex:1}
+.iconbtn{width:36px;height:36px;border:none;background:transparent;color:var(--text);border-radius:50%;cursor:pointer;}
+.iconbtn:active{opacity:.7}
+.backbtn{display:none;}
+@media(max-width:900px){.backbtn{display:inline-block;}}
+
+/* Search */
+.search{padding:8px 12px;border-bottom:1px solid var(--border);}
+.search input{width:100%;padding:10px 12px;border-radius:999px;border:1px solid var(--border);background:transparent;color:var(--text);}
+
+/* Lists */
+.list{overflow:auto;height:calc(100vh - 96px);}
+.row{display:flex;gap:12px;padding:10px 12px;border-bottom:1px solid var(--border);cursor:pointer;}
+.row:hover{background:rgba(127,127,127,.08);}
+.row .meta{flex:1;min-width:0}
+.row .name{font-weight:600;}
+.row .preview{color:var(--muted);font-size:.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.row .right{text-align:right;color:var(--muted);font-size:.8rem;}
+.badge{display:inline-block;min-width:20px;padding:2px 6px;border-radius:999px;background:var(--accent);color:#fff;font-size:.75rem;font-weight:700;}
+
+/* Chat */
+.chat{display:flex;flex-direction:column;height:100%;}
+.messages{flex:1;overflow:auto;padding:16px 12px 8px;background:linear-gradient(180deg,rgba(0,0,0,.03),rgba(0,0,0,0));}
+.daysep{display:inline-block;margin:12px auto;padding:6px 10px;border-radius:999px;background:rgba(127,127,127,.15);color:var(--muted);font-size:.8rem;}
+.bubble{max-width:75%;padding:8px 10px;border-radius:12px;margin:6px 0;word-wrap:break-word;white-space:pre-wrap;}
+.me{margin-left:auto;background:var(--bubble-me);}
+.them{margin-right:auto;background:var(--bubble-them);}
+.meta-row{display:flex;align-items:center;gap:6px;justify-content:flex-end;color:var(--muted);font-size:.75rem;margin-top:4px;}
+.tick{font-size:.9rem;}
+.typing{display:flex;align-items:center;gap:6px;color:var(--muted);font-size:.9rem;padding:6px 12px;}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--muted);animation:blink 1.2s infinite;}
+.dot:nth-child(2){animation-delay:.2s}.dot:nth-child(3){animation-delay:.4s}
+
+/* Composer */
+.composer{display:flex;gap:8px;padding:8px;border-top:1px solid var(--border);background:var(--panel);position:sticky;bottom:0;}
+.composer input{flex:1;padding:10px 12px;border-radius:18px;border:1px solid var(--border);background:transparent;color:var(--text);}
+.sendbtn{background:var(--accent);color:#fff;border:none;border-radius:18px;padding:10px 14px;font-weight:700;cursor:pointer;}
+.sendbtn:active{transform:scale(.98)}
+
+/* Footer tabs */
+.footer{display:flex;justify-content:space-around;align-items:center;padding:6px 0;border-top:1px solid var(--border);background:var(--panel);}
+.tab{flex:1;border:none;background:transparent;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:2px;font-size:.9rem;padding:4px 0;cursor:pointer;}
+.tab.active{color:var(--accent-dark);font-weight:600;}
+.tab span{font-size:.75rem;}
+
+/* Menus */
+.menu-wrap{position:relative}
+.menu{position:absolute;right:6px;top:40px;min-width:180px;background:var(--panel);border:1px solid var(--border);border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.18);display:none;z-index:20;}
+.menu.show{display:block}
+.menuitem{width:100%;text-align:left;padding:10px 12px;border:none;background:transparent;color:var(--text);cursor:pointer;font-size:.95rem;}
+.menuitem:hover{background:rgba(127,127,127,.08)}
+.menuitem.danger{color:var(--danger);font-weight:600}
+
+/* Status grid */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;padding:12px;}
+.card{border:1px solid var(--border);border-radius:10px;overflow:hidden;background:var(--panel);}
+.card img{width:100%;display:block;}
+.card .p{padding:8px 10px;font-size:.9rem;color:var(--muted);}
+
+/* Calls */
+.call-type{font-size:.8rem;}
+.call-type.in{color:var(--accent-dark);}
+.call-type.missed{color:var(--danger);font-weight:700;}
+
+/* Toast */
+.toast{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);background:#111;color:#fff;padding:8px 12px;border-radius:8px;font-size:.9rem;opacity:0;pointer-events:none;transition:opacity .2s;z-index:50;}
+.toast.show{opacity:1}
+</style>
+</head>
+<body>
+<!-- Splash -->
+<div id="splash">
+  <div class="logo">
+    <div class="logo-circle">WA</div>
+    <div class="logo-text">What A App</div>
+  </div>
+  <div class="loading"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+</div>
+
+<div class="app">
+  <div class="content">
+    <!-- Left: Tabs & panels -->
+    <section class="panel" id="leftPanel">
+      <div class="topbar">
+        <div class="avatar">WA</div>
+        <div class="title">What A App</div>
+        <div class="spacer"></div>
+        <button class="iconbtn" id="cameraBtn" title="કેમેરા">📷</button>
+        <div class="menu-wrap">
+          <button class="iconbtn" id="menuBtn" title="મેનુ">⋮</button>
+          <div class="menu" id="menuDropdown">
+            <button class="menuitem" data-action="newChat">નવો ચેટ</button>
+            <button class="menuitem" data-action="newGroup">નવું ગ્રુપ</button>
+            <button class="menuitem" data-action="settings">સેટિંગ્સ</button>
+            <button class="menuitem" data-action="toggleTheme">ડાર્ક/લાઇટ</button>
+            <button class="menuitem danger" data-action="clearData">ડેટા ક્લિયર</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="search" id="searchBar">
+        <input id="searchInput" type="text" placeholder="સર્ચ કરો (નામ/મેસેજ)" />
+      </div>
+
+      <div id="tabPanels" style="height:calc(100vh - 140px);overflow:auto;">
+        <div id="panel-chat" class="list"></div>
+
+        <div id="panel-update" style="display:none;">
+          <div class="grid" id="statusGrid"></div>
+          <div style="padding:12px;">
+            <input type="file" id="statusInput" accept="image/*" capture="environment" />
+            <button class="sendbtn" id="addStatusBtn">સ્ટેટસ ઉમેરો</button>
+          </div>
+        </div>
+
+        <div id="panel-community" style="display:none;">
+          <div style="padding:12px;">
+            <textarea id="communityText" rows="3" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--text);" placeholder="પોસ્ટ લખો…"></textarea>
+            <button class="sendbtn" id="addCommunityPost">પોસ્ટ કરો</button>
+          </div>
+          <div class="list" id="communityList"></div>
+        </div>
+
+        <div id="panel-call" style="display:none;">
+          <div class="list" id="callList"></div>
+          <div style="padding:12px;display:flex;gap:8px;">
+            <input id="callName" type="text" placeholder="નામ" style="flex:1;padding:10px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--text);" />
+            <select id="callType" style="padding:10px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--text);">
+              <option value="in">In</option>
+              <option value="out">Out</option>
+              <option value="missed">Missed</option>
+            </select>
+            <button class="sendbtn" id="addCall">એડ કરો</button>
+          </div>
+        </div>
+
+        <div id="panel-settings" style="display:none;padding:12px;">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+            <div class="avatar">WA</div>
+            <div>
+              <div style="font-weight:700;">Dev</div>
+              <div style="color:var(--muted);">What A App</div>
+            </div>
+          </div>
+          <button class="sendbtn" id="toggleThemeBtn">ડાર્ક/લાઇટ</button>
+          <button class="sendbtn" id="clearDataBtn" style="background:var(--danger);margin-left:8px;">ડેટા ક્લિયર</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Right: Chat panel -->
+    <section class="panel chat" id="chatPanel">
+      <div class="topbar">
+        <button class="iconbtn backbtn" id="backBtn" title="પાછા">⬅️</button>
+        <div class="avatar" id="chatAvatar">A</div>
+        <div class="title" id="chatTitle">ચેટ</div>
+        <div class="spacer"></div>
+        <button class="iconbtn" id="cameraBtnChat" title="કેમેરા">📷</button>
+        <button class="iconbtn" id="voiceCallBtn" title="કૉલ">📞</button>
+        <button class="iconbtn" id="videoCallBtn" title="વિડિયો">🎥</button>
+        <div class="menu-wrap">
+          <button class="iconbtn" id="menuBtnChat" title="મેનુ">⋮</button>
+          <div class="menu" id="menuDropdownChat">
+            <button class="menuitem" data-action="viewContact">કૉન્ટેક્ટ જુઓ</button>
+            <button class="menuitem" data-action="searchInChat">ચેટમાં સર્ચ</button>
+            <button class="menuitem" data-action="mute">મ્યૂટ</button>
+            <button class="menuitem" data-action="deleteChat">ચેટ ડિલીટ</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="messages" id="messages"></div>
+      <div class="typing" id="typingRow" style="display:none">
+        <span>ટાઇપ કરી રહ્યા છે</span>
+        <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+      </div>
+      <div class="composer">
+        <button class="iconbtn" id="emojiBtn" title="ઇમોજી">😊</button>
+        <input id="msgInput" type="text" placeholder="મેસેજ લખો…" />
+        <input type="file" id="fileInput" accept="image/*,audio/*,.pdf,.doc,.docx" style="display:none" />
+        <button class="iconbtn" id="attachBtn" title="એટેચ">📎</button>
+        <button class="sendbtn" id="sendBtn">મોકલો</button>
+      </div>
+    </section>
+  </div>
+
+  <nav class="footer">
+    <button class="tab active" data-tab="chat">💬<span>ચેટ</span></button>
+    <button class="tab" data-tab="update">🔔<span>અપડેટ</span></button>
+    <button class="tab" data-tab="community">👥<span>કમ્યુનિટી</span></button>
+    <button class="tab" data-tab="call">📞<span>કૉલ</span></button>
+    <button class="tab" data-tab="settings">⚙️<span>સેટિંગ્સ</span></button>
+  </nav>
+</div>
+
+<div class="toast" id="toast">Saved</div>
+
+<script>
+/* Storage & defaults */
+const LS_KEY="waa_v1";
+function ts(minAgo){return Date.now()+minAgo*60*1000}
+function initials(name){const p=name.trim().split(/\s+/);return p.slice(0,2).map(x=>x[0]).join("").toUpperCase()}
+function msgMe(text,ago=0){return{from:"me",text,time:ts(ago),status:"sent"}}
+function msgThem(text,ago=0){return{from:"them",text,time:ts(ago)}}
+
+const defaultContacts=[
+  {id:"1",name:"મમ્મી",number:"+919876543210",color:"#e67e22",preview:"રાત્રે શું ખાશો?",time:ts(-30),unread:1,isGroup:false},
+  {id:"2",name:"રવિ",number:"+919812345678",color:"#16a085",preview:"કાલે મેચ છે?",time:ts(-120),unread:0,isGroup:false},
+  {id:"3",name:"સ્કૂલ ગ્રુપ",number:null,color:"#8e44ad",preview:"મીટિંગ 5 વાગ્યે",time:ts(-300),unread:3,isGroup:true},
+  {id:"4",name:"દીપા",number:"+919811112222",color:"#c0392b",preview:"👍",time:ts(-1440),unread:0,isGroup:false},
+];
+const defaultChats={
+  "1":[msgThem("રાત્રે શું ખાશો?",-30),msgMe("પનીર ટિક્કા? 😋",-28)],
+  "2":[msgThem("કાલે મેચ છે?",-120),msgMe("હા, 7 વાગ્યે.",-115)],
+  "3":[msgThem("મીટિંગ 5 વાગ્યે",-300),msgThem("સમયસર આવજો.",-295)],
+  "4":[msgThem("👍",-1440)],
+};
+const defaultStatus=[{id:"s1",by:"Dev",img:null,text:"નવો પ્રોજેક્ટ!",time:ts(-60)}];
+const defaultCommunity=[{id:"p1",by:"Admin",text:"આજે 6 વાગ્યે મીટિંગ.",time:ts(-180)}];
+const defaultCalls=[{id:"c1",name:"રવિ",type:"in",time:ts(-200)},{id:"c2",name:"દીપા",type:"missed",time:ts(-80)}];
+
+function loadState(){
+  try{const raw=localStorage.getItem(LS_KEY);if(!raw)return{contacts:defaultContacts,chats:defaultChats,theme:"light",status:defaultStatus,community:defaultCommunity,calls:defaultCalls};return JSON.parse(raw);}
+  catch(e){return{contacts:defaultContacts,chats:defaultChats,theme:"light",status:defaultStatus,community:defaultCommunity,calls:defaultCalls}}
+}
+function saveState(){localStorage.setItem(LS_KEY,JSON.stringify(state));showToast("Saved")}
+
+/* State */
+let state=loadState(); let currentId=null; let currentTab="chat";
+
+/* Elements */
+const contactsPanel=document.getElementById("panel-chat");
+const searchInput=document.getElementById("searchInput");
+const messagesEl=document.getElementById("messages");
+const chatTitle=document.getElementById("chatTitle");
+const chatAvatar=document.getElementById("chatAvatar");
+const typingRow=document.getElementById("typingRow");
+const msgInput=document.getElementById("msgInput");
+const sendBtn=document.getElementById("sendBtn");
+const backBtn=document.getElementById("backBtn");
+const attachBtn=document.getElementById("attachBtn");
+const fileInput=document.getElementById("fileInput");
+const toggleThemeBtn=document.getElementById("toggleThemeBtn");
+const clearDataBtn=document.getElementById("clearDataBtn");
+
+const tabs=document.querySelectorAll(".footer .tab");
+const panelUpdate=document.getElementById("panel-update");
+const statusGrid=document.getElementById("statusGrid");
+const statusInput=document.getElementById("statusInput");
+const addStatusBtn=document.getElementById("addStatusBtn");
+
+const panelCommunity=document.getElementById("panel-community");
+const communityText=document.getElementById("communityText");
+const addCommunityPost=document.getElementById("addCommunityPost");
+const communityList=document.getElementById("communityList");
+
+const panelCall=document.getElementById("panel-call");
+const callList=document.getElementById("callList");
+const callName=document.getElementById("callName");
+const callType=document.getElementById("callType");
+const addCall=document.getElementById("addCall");
+
+const panelSettings=document.getElementById("panel-settings");
+
+/* Header buttons */
+const cameraBtn=document.getElementById("cameraBtn");
+const menuBtn=document.getElementById("menuBtn");
+const menuDropdown=document.getElementById("menuDropdown");
+
+const cameraBtnChat=document.getElementById("cameraBtnChat");
+const voiceCallBtn=document.getElementById("voiceCallBtn");
+const videoCallBtn=document.getElementById("videoCallBtn");
+const menuBtnChat=document.getElementById("menuBtnChat");
+const menuDropdownChat=document.getElementById("menuDropdownChat");
+
+/* Global camera input */
+const cameraInputGlobal=document.createElement("input");
+cameraInputGlobal.type="file"; cameraInputGlobal.accept="image/*"; cameraInputGlobal.capture="environment"; cameraInputGlobal.style.display="none";
+document.body.appendChild(cameraInputGlobal);
+
+/* Helpers */
+function formatTime(t){const d=new Date(t);const hh=String(d.getHours()).padStart(2,"0");const mm=String(d.getMinutes()).padStart(2,"0");return `${hh}:${mm}`}
+function showToast(text){const t=document.getElementById("toast");t.textContent=text;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),1200)}
+function escapeHtml(s){return s.replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
+function linkify(s){return s.replace(/(https?:\/\/[^\s]+)/g,'<a href="$1" target="_blank">$1</a>').replace(/([\w.-]+@[\w.-]+\.\w+)/g,'<a href="mailto:$1">$1</a>')}
+function applyTheme(){if(state.theme==="dark")document.documentElement.classList.add("dark");else document.documentElement.classList.remove("dark")}
+
+/* Tabs */
+function switchTab(tab){
+  currentTab=tab; tabs.forEach(b=>b.classList.toggle("active",b.dataset.tab===tab));
+  contactsPanel.style.display=tab==="chat"?"block":"none";
+  panelUpdate.style.display=tab==="update"?"block":"none";
+  panelCommunity.style.display=tab==="community"?"block":"none";
+  panelCall.style.display=tab==="call"?"block":"none";
+  panelSettings.style.display=tab==="settings"?"block":"none";
+  document.getElementById("searchBar").style.display=tab==="chat"?"block":"none";
+}
+tabs.forEach(btn=>btn.addEventListener("click",()=>switchTab(btn.dataset.tab)));
+
+/* Contacts render */
+function renderContacts(){
+  const q=(searchInput.value||"").toLowerCase();
+  const items=state.contacts
+    .map(c=>{
+      const chat=state.chats[c.id]||[];
+      const last=chat[chat.length-1];
+      const preview=last?(last.text||(last.image?"📷 ફોટો":"")||(last.file?"📄 ફાઇલ":"")):c.preview||"";
+      const time=last?last.time:c.time;
+      return {...c,preview,time};
+    })
+    .filter(c=>!q||c.name.toLowerCase().includes(q)||(c.preview||"").toLowerCase().includes(q))
+    .sort((a,b)=>b.time-a.time);
+
+  contactsPanel.innerHTML="";
+  items.forEach(c=>{
+    const row=document.createElement("div"); row.className="row";
+    row.innerHTML=`
+      <div class="avatar" style="background:${c.color}">${initials(c.name)}</div>
+      <div class="meta">
+        <div class="name">${c.name} ${c.isGroup?"👥":""}</div>
+        <div class="preview">${escapeHtml(c.preview||"")}</div>
+      </div>
+      <div class="right">
+        <div>${formatTime(c.time)}</div>
+        ${c.unread>0?`<div class="badge">${c.unread}</div>`:""}
+      </div>`;
+    row.addEventListener("click",()=>openChat(c.id));
+    contactsPanel.appendChild(row);
+  });
+}
+
+/* Open chat */
+function openChat(id){
+  currentId=id;
+  const c=state.contacts.find(x=>x.id===id);
+  chatTitle.textContent=c.name+(c.isGroup?" 👥":"");
+  chatAvatar.textContent=initials(c.name); chatAvatar.style.background=c.color;
+  c.unread=0; renderContacts(); renderMessages();
+  if(window.innerWidth<=900){document.getElementById("leftPanel").style.display="none";document.getElementById("chatPanel").style.display="block";}
+}
+
+/* Messages render */
+function renderMessages(){
+  const chat=state.chats[currentId]||[];
+  messagesEl.innerHTML=""; let lastDay="";
+  chat.forEach(m=>{
+    const day=new Date(m.time).toDateString();
+    if(day!==lastDay){const sep=document.createElement("div");sep.className="daysep";sep.textContent=day;messagesEl.appendChild(sep);lastDay=day;}
+    const b=document.createElement("div"); b.className="bubble "+(m.from==="me"?"me":"them");
+    b.innerHTML=`<div>${linkify(escapeHtml(m.text||""))}</div>
+      <div class="meta-row"><span>${formatTime(m.time)}</span>${m.from==="me"?`<span class="tick">${tickIcon(m.status)}</span>`:""}</div>`;
+    if(m.image){const img=document.createElement("img");img.src=m.image;img.style.maxWidth="220px";img.style.borderRadius="8px";img.style.display="block";img.style.marginTop="6px";b.appendChild(img)}
+    if(m.file){const a=document.createElement("a");a.href=m.file.data;a.download=m.file.name;a.textContent=`📄 ${m.file.name}`;a.style.display="inline-block";a.style.marginTop="6px";b.appendChild(a)}
+    messagesEl.appendChild(b);
+  });
+  messagesEl.scrollTop=messagesEl.scrollHeight;
+}
+function tickIcon(s){if(s==="sent")return"✅";if(s==="delivered")return"✔✔";if(s==="read")return"✔✔";return"✅"}
+
+/* Send */
+function sendMessage(){
+  if(!currentId){showToast("પહેલાં ચેટ પસંદ કરો");return}
+  const text=msgInput.value.trim(); if(!text)return;
+  const chat=state.chats[currentId]||(state.chats[currentId]=[]);
+  const m={from:"me",text,time:Date.now(),status:"sent"}; chat.push(m);
+  msgInput.value=""; renderMessages(); saveState();
+  setTimeout(()=>{m.status="delivered";renderMessages();saveState()},500);
+  setTimeout(()=>{m.status="read";renderMessages();saveState()},1200);
+  simulateTypingThenReply(currentId,"બરાબર! ✅");
+}
+
+/* Typing + auto reply */
+function simulateTypingThenReply(id,reply){
+  if(currentId!==id)return;
+  typingRow.style.display="flex";
+  setTimeout(()=>{
+    typingRow.style.display="none";
+    const chat=state.chats[id]||(state.chats[id]=[]);
+    chat.push({from:"them",text:reply,time:Date.now()});
+    const c=state.contacts.find(x=>x.id===id); c.time=Date.now();
+    renderMessages(); renderContacts(); saveState();
+  },1000);
+}
+
+/* Attachments */
+attachBtn.addEventListener("click",()=>fileInput.click());
+fileInput.addEventListener("change",()=>{
+  const file=fileInput.files?.[0]; if(!file||!currentId)return;
+  const reader=new FileReader();
+  reader.onload=()=>{
+    const chat=state.chats[currentId]||(state.chats[currentId]=[]);
+    if(file.type.startsWith("image/")){
+      chat.push({from:"me",text:"📷 ફોટો",image:reader.result,time:Date.now(),status:"sent"});
+    }else{
+      chat.push({from:"me",text:"ડોક્યુમેન્ટ મોકલ્યો",file:{name:file.name,data:reader.result},time:Date.now(),status:"sent"});
+    }
+    renderMessages(); saveState();
+  };
+  reader.readAsDataURL(file);
+});
+
+/* Status */
+function renderStatus(){
+  statusGrid.innerHTML="";
+  state.status.sort((a,b)=>b.time-a.time).forEach(s=>{
+    const card=document.createElement("div"); card.className="card";
+    if(s.img){const img=document.createElement("img");img.src=s.img;card.appendChild(img)}
+    const p=document.createElement("div"); p.className="p"; p.textContent=`${s.by}: ${s.text||""} • ${formatTime(s.time)}`;
+    card.appendChild(p); statusGrid.appendChild(card);
+  });
+}
+addStatusBtn.addEventListener("click",()=>{
+  const file=statusInput.files?.[0];
+  const entry={id:String(Date.now()),by:"Dev",img:null,text:"",time:Date.now()};
+  if(file){const r=new FileReader();r.onload=()=>{entry.img=r.result;state.status.push(entry);renderStatus();saveState();showToast("સ્ટેટસ ઉમેરાયો")};r.readAsDataURL(file)}
+  else{entry.text="ટેક્સ્ટ સ્ટેટસ";state.status.push(entry);renderStatus();saveState();showToast("સ્ટેટસ ઉમેરાયો")}
+});
+
+/* Community */
+function renderCommunity(){
+  communityList.innerHTML="";
+  state.community.sort((a,b)=>b.time-a.time).forEach(p=>{
+    const row=document.createElement("div"); row.className="row";
+    row.innerHTML=`
+      <div class="avatar" style="background:#128C7E">${initials(p.by)}</div>
+      <div class="meta"><div class="name">${p.by}</div><div class="preview">${escapeHtml(p.text)}</div></div>
+      <div class="right"><div>${formatTime(p.time)}</div></div>`;
+    communityList.appendChild(row);
+  });
+}
+addCommunityPost.addEventListener("click",()=>{
+  const text=communityText.value.trim(); if(!text)return;
+  state.community.push({id:String(Date.now()),by:"Dev",text,time:Date.now()});
+  communityText.value=""; renderCommunity(); saveState(); showToast("પોસ્ટ ઉમેરાઈ");
+});
+
+/* Calls */
+function renderCalls(){
+  callList.innerHTML="";
+  state.calls.sort((a,b)=>b.time-a.time).forEach(c=>{
+    const row=document.createElement("div"); row.className="row";
+    row.innerHTML=`
+      <div class="avatar" style="background:#16a085">${initials(c.name)}</div>
+      <div class="meta"><div class="name">${c.name}</div><div class="preview"><span class="call-type ${c.type}">${c.type}</span></div></div>
+      <div class="right"><div>${formatTime(c.time)}</div></div>`;
+    callList.appendChild(row);
+  });
+}
+addCall.addEventListener("click",()=>{
+  const name=callName.value.trim(); const type=callType.value; if(!name)return;
+  state.calls.push({id:String(Date.now()),name,type,time:Date.now()});
+  callName.value=""; renderCalls(); saveState(); showToast("કૉલ ઉમેરાયો");
+});
+
+/* Theme & settings */
+function toggleThemeFn(){state.theme=state.theme==="dark"?"light":"dark";applyTheme();saveState()}
+toggleThemeBtn.addEventListener("click",toggleThemeFn);
+clearDataBtn.addEventListener("click",()=>{
+  if(confirm("બધું localStorage ડેટા ક્લિયર કરવું?")){
+    localStorage.removeItem(LS_KEY); state=loadState(); applyTheme(); renderAll(); showToast("Cleared");
+  }
+});
+
+/* Menus */
+function toggleMenu(el){el.classList.toggle("show")}
+function closeMenus(){menuDropdown?.classList.remove("show");menuDropdownChat?.classList.remove("show")}
+document.addEventListener("click",(e)=>{
+  const isBtn=e.target===menuBtn||e.target===menuBtnChat;
+  const inside=menuDropdown?.contains(e.target)||menuDropdownChat?.contains(e.target);
+  if(!isBtn&&!inside)closeMenus();
+});
+menuBtn?.addEventListener("click",(e)=>{e.stopPropagation();toggleMenu(menuDropdown)});
+menuDropdown?.addEventListener("click",(e)=>{
+  const action=e.target.dataset.action; if(!action)return; closeMenus();
+  if(action==="newChat"){
+    const id=String(Date.now());
+    state.contacts.push({id,name:"નવો સંપર્ક",number:"+910000000000",color:"#128C7E",preview:"",time:Date.now(),unread:0,isGroup:false});
+    state.chats[id]=[]; saveState(); renderContacts(); openChat(id);
+  }else if(action==="newGroup"){
+    const id=String(Date.now());
+    state.contacts.push({id,name:"નવું ગ્રુપ",number:null,color:"#8e44ad",preview:"",time:Date.now(),unread:0,isGroup:true});
+    state.chats[id]=[]; saveState(); renderContacts(); openChat(id);
+  }else if(action==="settings"){
+    switchTab("settings");
+  }else if(action==="toggleTheme"){
+    toggleThemeFn();
+  }else if(action==="clearData"){
+    if(confirm("બધું localStorage ડેટા ક્લિયર કરવું?")){
+      localStorage.removeItem(LS_KEY); state=loadState(); applyTheme(); renderAll(); showToast("Cleared");
+    }
+  }
+});
+menuBtnChat?.addEventListener("click",(e)=>{e.stopPropagation();toggleMenu(menuDropdownChat)});
+menuDropdownChat?.addEventListener("click",(e)=>{
+  const action=e.target.dataset.action; if(!action)return; closeMenus();
+  if(action==="viewContact"){
+    const c=state.contacts.find(x=>x.id===currentId);
+    showToast((c?.name||"કૉન્ટેક્ટ")+" • "+(c?.number||"નંબર નથી"));
+  }else if(action==="searchInChat"){
+    showToast("ચેટમાં સર્ચ");
+  }else if(action==="mute"){
+    showToast("ચેટ મ્યૂટ");
+  }else if(action==="deleteChat"){
+    deleteChat();
+  }
+});
+
+/* Camera & calls */
+function openCameraAndSend(){
+  if(!currentId){showToast("પહેલાં ચેટ પસંદ કરો");return}
+  cameraInputGlobal.value="";
+  cameraInputGlobal.onchange=()=>{
+    const file=cameraInputGlobal.files?.[0]; if(!file)return;
+    const r=new FileReader();
+    r.onload=()=>{
+      const chat=state.chats[currentId]||(state.chats[currentId]=[]);
+      chat.push({from:"me",text:"📷 ફોટો",image:r.result,time:Date.now(),status:"sent"});
+      renderMessages(); saveState();
+    };
+    r.readAsDataURL(file);
+  };
+  cameraInputGlobal.click();
+}
+cameraBtn.addEventListener("click",openCameraAndSend);
+cameraBtnChat.addEventListener("click",openCameraAndSend);
+
+voiceCallBtn.addEventListener("click",()=>{
+  const c=state.contacts.find(x=>x.id===currentId);
+  if(c&&c.number){window.location.href="tel:"+c.number}else{showToast("આ contact પાસે નંબર નથી")}
+});
+videoCallBtn.addEventListener("click",()=>{showToast("Video call માટે WebRTC જોઈએ (હાલ demo)")});
+
+/* Delete chat */
+function deleteChat(){
+  if(!currentId)return;
+  if(!confirm("આ ચેટ ડિલીટ કરવી?"))return;
+  state.chats[currentId]=[];
+  const c=state.contacts.find(x=>x.id===currentId); c.preview=""; c.unread=0;
+  renderMessages(); renderContacts(); saveState();
+}
+
+/* Emoji */
+const emojis=["😊","👍","🎉","🙏","❤️","🔥","😂","😎","🥳","🤝"];
+document.getElementById("emojiBtn").addEventListener("click",()=>{
+  const e=emojis[Math.floor(Math.random()*emojis.length)];
+  msgInput.value+=(msgInput.value?" ":"")+e; msgInput.focus();
+});
+
+/* Events */
+searchInput.addEventListener("input",renderContacts);
+sendBtn.addEventListener("click",sendMessage);
+msgInput.addEventListener("keydown",(e)=>{if(e.key==="Enter"){e.preventDefault();sendMessage()}})
+backBtn.addEventListener("click",()=>{
+  if(window.innerWidth<=900){
+    document.getElementById("leftPanel").style.display="block";
+    document.getElementById("chatPanel").style.display="none";
+  }
+});
+
+/* Init */
+function renderAll(){applyTheme();renderContacts();renderStatus();renderCommunity();renderCalls();switchTab(currentTab);if(window.innerWidth>900){openChat(state.contacts[0].id)}}
+renderAll();
+
+/* Splash fade */
+setTimeout(()=>{
+  const s=document.getElementById("splash"); s.classList.add("fade"); setTimeout(()=>s.remove(),800);
+},2000);
+</script>
+</body>
+</html>
