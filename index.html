@@ -3,248 +3,196 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>What A App - Vidushi</title>
+<title>WhatsApp Clone - Devendrabhai</title>
 <style>
-:root{--bg:#f0f2f5;--panel:#fff;--text:#111;--muted:#667;--accent:#25D366;--accent-dark:#128C7E;--bubble-me:#d9fdd3;--bubble-them:#fff;--border:#e5e7eb;--danger:#e53935;}
+:root{--bg:#f0f2f5;--panel:#fff;--text:#111;--muted:#667;--accent:#25D366;--accent-dark:#128C7E;--bubble-me:#d9fdd3;--bubble-them:#fff;--border:#e5e7eb;}
 .dark{--bg:#0b141a;--panel:#111b21;--text:#e9edef;--muted:#aebac1;--bubble-me:#005c4b;--bubble-them:#202c33;--border:#1f2c34;}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,sans-serif;overflow:hidden;}
 
-/* Splash */
-#splash{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#25D366;color:#fff;z-index:9999;transition:opacity .8s ease;}
-#splash.fade{opacity:0;pointer-events:none;}
-.logo-circle{width:80px;height:80px;border-radius:50%;background:#fff;color:#25D366;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:2rem;margin-bottom:10px;}
-
-/* Layout */
+#splash{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#25D366;color:#fff;z-index:9999;}
 .app{display:flex;flex-direction:column;height:100vh;}
-.content{flex:1;display:grid;grid-template-columns:360px 1fr;min-height:0;}
-@media(max-width:900px){.content{grid-template-columns:1fr;}}
+.content{display:grid;grid-template-columns:360px 1fr;height:100%;}
+@media(max-width:900px){.content{grid-template-columns:1fr;} #chatPanel{display:none;position:fixed;inset:0;z-index:100;}}
 
 .panel{background:var(--panel);border-right:1px solid var(--border);display:flex;flex-direction:column;}
-.topbar{display:flex;align-items:center;gap:10px;padding:12px;border-bottom:1px solid var(--border);background:var(--panel);}
-.avatar{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:700;background:#128C7E;flex-shrink:0;}
-.spacer{flex:1}
-.iconbtn{border:none;background:transparent;cursor:pointer;font-size:1.2rem;padding:5px;}
+.topbar{display:flex;align-items:center;gap:10px;padding:12px;border-bottom:1px solid var(--border);background:var(--panel);flex-shrink:0;}
+.avatar{width:40px;height:40px;border-radius:50%;object-fit:cover;background:#128C7E;display:grid;place-items:center;font-weight:bold;color:white;flex-shrink:0;}
 
-/* Search & List */
-.search{padding:8px 12px;border-bottom:1px solid var(--border);}
-.search input{width:100%;padding:10px;border-radius:20px;border:1px solid var(--border);background:var(--bg);color:var(--text);}
-.list{overflow-y:auto;flex:1;}
-.row{display:flex;gap:12px;padding:12px;border-bottom:1px solid var(--border);cursor:pointer;transition:0.2s;}
+.list-container{flex:1;overflow-y:auto;}
+.row{display:flex;align-items:center;padding:12px;border-bottom:1px solid var(--border);cursor:pointer;}
 .row:hover{background:rgba(0,0,0,0.05);}
-.row .meta{flex:1;min-width:0;}
-.row .name{font-weight:600;margin-bottom:2px;}
-.row .preview{color:var(--muted);font-size:0.85rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 
-/* Chat Area */
-#chatPanel{display:flex;flex-direction:column;}
-@media(max-width:900px){#chatPanel{display:none;position:fixed;inset:0;z-index:50;background:var(--bg);}}
-.messages{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png');}
-.bubble{max-width:70%;padding:8px 12px;border-radius:10px;margin:5px 0;position:relative;font-size:0.95rem;line-height:1.4;}
-.me{align-self:flex-end;background:var(--bubble-me);border-bottom-right-radius:2px;}
-.them{align-self:flex-start;background:var(--bubble-them);border-bottom-left-radius:2px;}
-.m-time{font-size:0.7rem;color:var(--muted);text-align:right;margin-top:4px;}
+.messages{flex:1;overflow-y:auto;padding:20px;background:#e5ddd5 url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png');display:flex;flex-direction:column;}
+.bubble{max-width:75%;padding:8px 12px;border-radius:10px;margin:5px 0;font-size:15px;position:relative;}
+.me{align-self:flex-end;background:var(--bubble-me);border-top-right-radius:0;}
+.them{align-self:flex-start;background:var(--bubble-them);border-top-left-radius:0;}
+.m-info{font-size:10px;color:var(--muted);text-align:right;margin-top:4px;}
+.tick{color:#34b7f1;font-weight:bold;}
 
-/* Input Area */
-.composer{padding:10px;display:flex;align-items:center;gap:10px;background:var(--panel);border-top:1px solid var(--border);}
-.composer input{flex:1;padding:12px;border-radius:25px;border:1px solid var(--border);background:var(--bg);color:var(--text);}
-.sendbtn{background:var(--accent-dark);color:white;border:none;padding:10px 18px;border-radius:20px;font-weight:bold;cursor:pointer;}
+.composer{padding:10px;background:var(--panel);display:flex;align-items:center;gap:10px;border-top:1px solid var(--border);}
+.composer input{flex:1;padding:12px;border-radius:25px;border:none;background:var(--bg);color:var(--text);outline:none;}
 
-/* Tabs */
-.footer{display:flex;background:var(--panel);border-top:1px solid var(--border);padding:8px 0;}
-.tab{flex:1;text-align:center;background:none;border:none;color:var(--muted);cursor:pointer;font-size:0.8rem;}
-.tab.active{color:var(--accent-dark);font-weight:bold;}
+.footer{display:flex;background:var(--panel);border-top:1px solid var(--border);padding:10px 0;}
+.tab-btn{flex:1;text-align:center;background:none;border:none;color:var(--muted);font-size:11px;cursor:pointer;}
+.tab-btn.active{color:var(--accent-dark);font-weight:bold;}
 
-/* Modals */
-.modal{position:fixed;inset:0;background:rgba(0,0,0,0.5);display:none;align-items:center;justify-content:center;z-index:1000;}
-.modal-content{background:var(--panel);padding:20px;border-radius:15px;width:90%;max-width:400px;}
-.modal-content input{width:100%;padding:10px;margin:10px 0;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--text);}
+.credit-line{font-size:10px;text-align:center;padding:5px;color:var(--muted);background:var(--panel);border-top:1px solid var(--border);}
+
+.modal{position:fixed;inset:0;background:rgba(0,0,0,0.5);display:none;align-items:center;justify-content:center;z-index:200;}
+.modal-content{background:var(--panel);padding:20px;border-radius:15px;width:90%;max-width:350px;}
 </style>
 </head>
 <body>
 
 <div id="splash">
-  <div class="logo-circle">WA</div>
-  <h2 style="margin:0">What A App</h2>
-  <p>જય શ્રી કૃષ્ણ 🙏</p>
+    <div style="font-size:40px;margin-bottom:10px;">💬</div>
+    <h2 style="margin:0">What A App</h2>
+    <p>Created by Devendrabhai 🙏</p>
 </div>
 
 <div class="app">
   <div class="content">
-    <section class="panel" id="leftPanel">
+    <section class="panel">
       <div class="topbar">
-        <div class="avatar">WA</div>
-        <div style="font-weight:bold">ચેટ્સ</div>
-        <div class="spacer"></div>
-        <button class="iconbtn" onclick="openModal()">➕</button>
-        <button class="iconbtn" id="themeToggle">🌓</button>
+        <div class="avatar" id="myAvatar">D</div>
+        <b id="pTitle">What A App</b>
+        <div style="flex:1"></div>
+        <span style="cursor:pointer" onclick="openModal()">➕</span>
       </div>
-      <div class="search"><input type="text" id="searchInput" placeholder="સર્ચ કરો..."></div>
-      <div id="chatList" class="list"></div>
       
+      <div class="list-container" id="mainList"></div>
+
+      <div class="credit-line">Vidushi Bot | Design by Devendrabhai</div>
       <nav class="footer">
-        <button class="tab active">💬<br>ચેટ</button>
-        <button class="tab">🔔<br>અપડેટ</button>
-        <button class="tab">👥<br>કોમ્યુનિટી</button>
-        <button class="tab">⚙️<br>સેટિંગ્સ</button>
+        <button class="tab-btn active" onclick="showTab('chat')">💬<br>ચેટ</button>
+        <button class="tab-btn" onclick="showTab('status')">🔔<br>અપડેટ</button>
+        <button class="tab-btn" onclick="showTab('comm')">👥<br>કોમ્યુનિટી</button>
+        <button class="tab-btn" onclick="showTab('set')">⚙️<br>સેટિંગ્સ</button>
       </nav>
     </section>
 
     <section class="panel" id="chatPanel">
       <div class="topbar">
-        <button class="iconbtn" id="backBtn" style="display:none">⬅️</button>
-        <div class="avatar" id="activeAvatar">?</div>
-        <div id="activeTitle" style="font-weight:bold">કોઈ ચેટ પસંદ કરો</div>
+        <button style="border:none;background:none;font-size:20px;cursor:pointer;" onclick="closeChat()" id="backBtn">⬅️</button>
+        <img id="chatImg" class="avatar" src="" style="display:none">
+        <div id="chatInitial" class="avatar">?</div>
+        <div style="margin-left:5px">
+          <b id="activeName">ચેટ પસંદ કરો</b><br>
+          <small id="lastSeen" style="color:var(--muted);font-size:11px">Online</small>
+        </div>
       </div>
-      <div class="messages" id="messageBox"></div>
+      <div class="messages" id="msgBox"></div>
       <div class="composer">
-        <input type="text" id="msgInput" placeholder="મેસેજ લખો...">
-        <button class="sendbtn" id="sendBtn">મોકલો</button>
+        <span style="cursor:pointer">😊</span>
+        <input type="text" id="mInput" placeholder="મેસેજ લખો...">
+        <span style="cursor:pointer">📎</span>
+        <button onclick="sendMsg()" style="border:none;background:none;color:var(--accent-dark);font-weight:bold;cursor:pointer;">મોકલો</button>
       </div>
     </section>
   </div>
 </div>
 
-<div class="modal" id="contactModal">
+<div class="modal" id="addModal">
   <div class="modal-content">
     <h3>નવો સંપર્ક ઉમેરો</h3>
-    <input type="text" id="newName" placeholder="નામ">
-    <input type="text" id="newNumber" placeholder="નંબર">
-    <div style="text-align:right">
-      <button onclick="closeModal()" style="background:none; border:none; color:red; cursor:pointer">રદ કરો</button>
-      <button onclick="saveContact()" style="background:var(--accent-dark); color:white; border:none; padding:8px 15px; border-radius:5px; margin-left:10px; cursor:pointer">સેવ કરો</button>
-    </div>
+    <input type="text" id="nName" placeholder="નામ" style="width:100%;padding:10px;margin-bottom:10px;border:1px solid var(--border);border-radius:5px;">
+    <input type="file" id="nImg" accept="image/*" style="margin-bottom:15px;width:100%;">
+    <button onclick="saveContact()" style="width:100%;padding:12px;background:var(--accent-dark);color:white;border:none;border-radius:5px;font-weight:bold;">સેવ કરો</button>
+    <button onclick="closeModal()" style="width:100%;padding:10px;background:none;border:none;color:red;margin-top:5px;">રદ કરો</button>
   </div>
 </div>
 
 <script>
-// State Management
-let state = JSON.parse(localStorage.getItem('wa_data')) || {
-  contacts: [
-    {id: 1, name: "મમ્મી", color: "#e67e22", lastMsg: "જય શ્રી કૃષ્ણ"},
-    {id: 2, name: "મિત્ર", color: "#16a085", lastMsg: "કેમ છે?"}
-  ],
-  chats: { 1: [], 2: [] },
+let state = JSON.parse(localStorage.getItem('wa_pro_v1')) || {
+  contacts: [{id:1, name:"મિત્ર", img:null, lastMsg:"જય શ્રી કૃષ્ણ"}],
+  chats: {1:[]},
   theme: 'light'
 };
+let curId = null;
 
-let activeChatId = null;
-
-// Initialization
-document.addEventListener('DOMContentLoaded', () => {
-  renderContacts();
-  if(state.theme === 'dark') document.body.classList.add('dark');
-  
-  // Splash Screen remove
-  setTimeout(() => {
-    document.getElementById('splash').classList.add('fade');
-    setTimeout(() => document.getElementById('splash').remove(), 800);
-  }, 1500);
-});
-
-// Theme Toggle
-document.getElementById('themeToggle').onclick = () => {
-  state.theme = state.theme === 'light' ? 'dark' : 'light';
-  document.body.classList.toggle('dark');
-  saveData();
-};
-
-function saveData() {
-  localStorage.setItem('wa_data', JSON.stringify(state));
-}
-
-function renderContacts() {
-  const list = document.getElementById('chatList');
-  const search = document.getElementById('searchInput').value.toLowerCase();
+function renderList() {
+  const list = document.getElementById('mainList');
   list.innerHTML = '';
-  
-  state.contacts.filter(c => c.name.toLowerCase().includes(search)).forEach(c => {
-    const row = document.createElement('div');
-    row.className = 'row';
-    row.onclick = () => openChat(c);
-    row.innerHTML = `
-      <div class="avatar" style="background:${c.color}">${c.name[0]}</div>
-      <div class="meta">
-        <div class="name">${c.name}</div>
-        <div class="preview">${c.lastMsg || ''}</div>
-      </div>
-    `;
-    list.appendChild(row);
+  state.contacts.forEach(c => {
+    const d = document.createElement('div');
+    d.className = 'row';
+    d.onclick = () => openChat(c);
+    const imgHtml = c.img ? `<img src="${c.img}" class="avatar">` : `<div class="avatar">${c.name[0]}</div>`;
+    d.innerHTML = `${imgHtml}<div style="margin-left:12px;flex:1;"><b>${c.name}</b><br><small style="color:var(--muted)">${c.lastMsg}</small></div><div style="font-size:10px;color:var(--muted)">10:30 AM</div>`;
+    list.appendChild(d);
   });
 }
 
-function openChat(contact) {
-  activeChatId = contact.id;
-  document.getElementById('activeTitle').innerText = contact.name;
-  document.getElementById('activeAvatar').innerText = contact.name[0];
-  document.getElementById('activeAvatar').style.background = contact.color;
+function openChat(c) {
+  curId = c.id;
+  document.getElementById('activeName').innerText = c.name;
+  const time = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+  document.getElementById('lastSeen').innerText = "Online";
+  
+  if(c.img) {
+    document.getElementById('chatImg').src = c.img;
+    document.getElementById('chatImg').style.display = 'block';
+    document.getElementById('chatInitial').style.display = 'none';
+  } else {
+    document.getElementById('chatImg').style.display = 'none';
+    document.getElementById('chatInitial').style.display = 'grid';
+    document.getElementById('chatInitial').innerText = c.name[0];
+  }
   
   if(window.innerWidth <= 900) {
     document.getElementById('chatPanel').style.display = 'flex';
-    document.getElementById('backBtn').style.display = 'block';
   }
-  
   renderMessages();
 }
 
 function renderMessages() {
-  const box = document.getElementById('messageBox');
+  const box = document.getElementById('msgBox');
   box.innerHTML = '';
-  const msgs = state.chats[activeChatId] || [];
-  
-  msgs.forEach(m => {
+  const time = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+  (state.chats[curId] || []).forEach(m => {
     const b = document.createElement('div');
-    b.className = `bubble ${m.from === 'me' ? 'me' : 'them'}`;
-    b.innerHTML = `<div>${m.text}</div><div class="m-time">${m.time}</div>`;
+    b.className = `bubble ${m.from}`;
+    b.innerHTML = `<div>${m.text}</div><div class="m-info">${time} ${m.from==='me'?'<span class="tick">✓✓</span>':''}</div>`;
     box.appendChild(b);
   });
   box.scrollTop = box.scrollHeight;
 }
 
-document.getElementById('sendBtn').onclick = sendMessage;
-document.getElementById('msgInput').onkeypress = (e) => { if(e.key === 'Enter') sendMessage(); };
-
-function sendMessage() {
-  const input = document.getElementById('msgInput');
-  const text = input.value.trim();
-  if(!text || !activeChatId) return;
-  
-  const now = new Date();
-  const timeStr = now.getHours() + ":" + String(now.getMinutes()).padStart(2, '0');
-  
-  state.chats[activeChatId].push({ from: 'me', text, time: timeStr });
-  
-  // Update last message in contact list
-  const contact = state.contacts.find(c => c.id === activeChatId);
-  if(contact) contact.lastMsg = text;
-  
-  input.value = '';
-  renderMessages();
-  renderContacts();
-  saveData();
+function sendMsg() {
+  const i = document.getElementById('mInput');
+  if(!i.value || !curId) return;
+  if(!state.chats[curId]) state.chats[curId] = [];
+  state.chats[curId].push({from:'me', text:i.value});
+  state.contacts.find(c => c.id === curId).lastMsg = i.value;
+  i.value = '';
+  saveState(); renderMessages(); renderList();
 }
-
-// Modal Functions
-function openModal() { document.getElementById('contactModal').style.display = 'flex'; }
-function closeModal() { document.getElementById('contactModal').style.display = 'none'; }
 
 function saveContact() {
-  const name = document.getElementById('newName').value;
+  const name = document.getElementById('nName').value;
+  const file = document.getElementById('nImg').files[0];
   if(!name) return;
-  const id = Date.now();
-  state.contacts.push({ id, name, color: '#128C7E', lastMsg: '' });
-  state.chats[id] = [];
-  saveData();
-  renderContacts();
-  closeModal();
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const id = Date.now();
+    state.contacts.push({id, name, img: file ? e.target.result : null, lastMsg: ''});
+    state.chats[id] = [];
+    saveState(); renderList(); closeModal();
+  };
+  if(file) reader.readAsDataURL(file); else reader.onload({target:{result:null}});
 }
 
-document.getElementById('backBtn').onclick = () => {
-  document.getElementById('chatPanel').style.display = 'none';
+function saveState() { localStorage.setItem('wa_pro_v1', JSON.stringify(state)); }
+function openModal() { document.getElementById('addModal').style.display = 'flex'; }
+function closeModal() { document.getElementById('addModal').style.display = 'none'; }
+function closeChat() { document.getElementById('chatPanel').style.display = 'none'; }
+function showTab(t) { document.getElementById('pTitle').innerText = t==='chat'?'What A App':t.toUpperCase(); }
+
+window.onload = () => {
+  renderList();
+  setTimeout(() => document.getElementById('splash').style.display = 'none', 1500);
 };
-
-document.getElementById('searchInput').oninput = renderContacts;
 </script>
-
 </body>
 </html>
