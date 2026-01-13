@@ -1,3 +1,156 @@
+<script>
+/* ---------- Storage & defaults ---------- */
+const LS_KEY="waa_final_v4";
+function ts(minAgo){return Date.now()+minAgo*60*1000}
+function initials(name){const p=name.trim().split(/\s+/);return p.slice(0,2).map(x=>x[0]).join("").toUpperCase()}
+function msgMe(text,ago=0){return{from:"me",text,time:ts(ago),status:"sent"}}
+function msgThem(text,ago=0){return{from:"them",text,time:ts(ago)}}
+
+const defaultContacts=[
+  {id:"1",name:"મમ્મી",number:"+919876543210",color:"#e67e22",preview:"રાત્રે શું ખાશો?",time:ts(-30),unread:1,isGroup:false},
+  {id:"2",name:"રવિ",number:"+919812345678",color:"#16a085",preview:"કાલે મેચ છે?",time:ts(-120),unread:0,isGroup:false},
+  {id:"3",name:"સ્કૂલ ગ્રુપ",number:null,color:"#8e44ad",preview:"મીટિંગ 5 વાગ્યે",time:ts(-300),unread:3,isGroup:true}
+];
+const defaultChats={
+  "1":[msgThem("રાત્રે શું ખાશો?",-30),msgMe("પનીર ટિક્કા? 😋",-28)],
+  "2":[msgThem("કાલે મેચ છે?",-120),msgMe("હા, 7 વાગ્યે.",-115)],
+  "3":[msgThem("મીટિંગ 5 વાગ્યે",-300),msgThem("સમયસર આવજો.",-295)]
+};
+
+function loadState(){
+  try{
+    const raw=localStorage.getItem(LS_KEY);
+    if(!raw)return{contacts:defaultContacts,chats:defaultChats,theme:"light",status:[],community:[],calls:[]};
+    return JSON.parse(raw);
+  }catch(e){
+    return{contacts:defaultContacts,chats:defaultChats,theme:"light",status:[],community:[],calls:[]}
+  }
+}
+function saveState(){localStorage.setItem(LS_KEY,JSON.stringify(state));showToast("Saved")}
+
+/* ---------- State ---------- */
+let state=loadState(); 
+let currentId=null; 
+let currentTab="chat"; 
+let editingId=null;
+
+/* ---------- Elements ---------- */
+const contactsPanel=document.getElementById("panel-chat");
+const searchInput=document.getElementById("searchInput");
+const tabs=document.querySelectorAll(".footer .tab");
+const panelUpdate=document.getElementById("panel-update");
+const panelCommunity=document.getElementById("panel-community");
+const panelCall=document.getElementById("panel-call");
+const panelSettings=document.getElementById("panel-settings");
+
+const chatTitle=document.getElementById("chatTitle");
+const chatAvatar=document.getElementById("chatAvatar");
+const backBtn=document.getElementById("backBtn");
+
+const toggleThemeBtn=document.getElementById("toggleThemeBtn");
+const addContactBtn=document.getElementById("addContactBtn");
+const toast=document.getElementById("toast");
+
+/* Modal */
+const contactModal=document.getElementById("contactModal");
+const formTitle=document.getElementById("formTitle");
+const contactName=document.getElementById("contactName");
+const contactNumber=document.getElementById("contactNumber");
+const saveContactBtn=document.getElementById("saveContactBtn");
+const cancelContactBtn=document.getElementById("cancelContactBtn");
+
+/* Image viewer */
+const imgViewer=document.getElementById("imgViewer");
+const imgViewerImg=document.getElementById("imgViewerImg");
+
+/* ---------- Helpers ---------- */
+function formatTime(t){const d=new Date(t);const hh=String(d.getHours()).padStart(2,"0");const mm=String(d.getMinutes()).padStart(2,"0");return `${hh}:${mm}`}
+function showToast(text){toast.textContent=text;toast.classList.add("show");setTimeout(()=>toast.classList.remove("show"),1200)}
+function escapeHtml(s){return s.replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
+function applyTheme(){if(state.theme==="dark")document.documentElement.classList.add("dark");else document.documentElement.classList.remove("dark")}
+
+/* ---------- Contacts ---------- */
+function renderContacts(){
+  const q=(searchInput.value||"").toLowerCase();
+  const items=state.contacts
+    .map(c=>{
+      const chat=state.chats[c.id]||[];
+      const last=chat[chat.length-1];
+      const preview=last?(last.text||(last.image?"📷 ફોટો":"")||(last.file?"📄 ફાઇલ":"")):c.preview||"";
+      const time=last?last.time:c.time;
+      return {...c,preview,time};
+    })
+    .filter(c=>!q||c.name.toLowerCase().includes(q)||(c.preview||"").toLowerCase().includes(q))
+    .sort((a,b)=>b.time-a.time);
+
+  contactsPanel.innerHTML="";
+  items.forEach(c=>{
+    const row=document.createElement("div"); row.className="row";
+    row.innerHTML=`
+      <div class="avatar" style="background:${c.color}">${initials(c.name)}</div>
+      <div class="meta">
+        <div class="name">${escapeHtml(c.name)} ${c.isGroup?"👥":""}</div>
+        <div class="preview">${escapeHtml(c.preview||"")}</div>
+      </div>
+      <div class="right">
+        <div>${formatTime(c.time)}</div>
+        ${c.unread>0?`<div class="badge">${c.unread}</div>`:""}
+      </div>`;
+    row.addEventListener("click",()=>openChat(c.id));
+    contactsPanel.appendChild(row);
+  });
+}
+function openChat(id){
+  currentId=id;
+  const c=state.contacts.find(x=>x.id===id);
+  chatTitle.textContent=c.name+(c.isGroup?" 👥":"");
+  chatAvatar.textContent=initials(c.name); chatAvatar.style.background=c.color;
+  c.unread=0; renderContacts(); renderMessages();
+  if(window.innerWidth<=900){
+    document.getElementById("leftPanel").style.display="none";
+    document.getElementById("chatPanel").style.display="block";
+  }
+}
+backBtn.addEventListener("click",()=>{
+  if(window.innerWidth<=900){
+    document.getElementById("leftPanel").style.display="block";
+    document.getElementById("chatPanel").style.display="none";
+  }
+});
+
+/* ---------- Contact Modal ---------- */
+function openContactForm(id=null){
+  editingId=id;
+  formTitle.textContent=id?"સંપર્ક Edit કરો":"નવો સંપર્ક ઉમેરો";
+  if(id){
+    const c=state.contacts.find(x=>x.id===id);
+    contactName.value=c?.name||""; contactNumber.value=c?.number||"";
+  }else{
+    contactName.value=""; contactNumber.value="";
+  }
+  contactModal.style.display="flex";
+}
+function closeContactForm(){ contactModal.style.display="none"; }
+cancelContactBtn.addEventListener("click",closeContactForm);
+saveContactBtn.addEventListener("click",()=>{
+  const name=contactName.value.trim(); const number=contactNumber.value.trim();
+  if(!name||!number){showToast("નામ/નંબર નાખો");return;}
+  if(editingId){
+    const c=state.contacts.find(x=>x.id===editingId);
+    c.name=name; c.number=number; c.time=Date.now();
+  }else{
+    const id=String(Date.now());
+    state.contacts.push({id,name,number,color:"#128C7E",preview:"",time:Date.now(),unread:0,isGroup:false});
+    state.chats[id]=[];
+  }
+  saveState(); renderContacts(); closeContactForm();
+});
+addContactBtn.addEventListener("click",()=>openContactForm());
+
+/* ---------- Theme ---------- */
+function toggleThemeFn(){state.theme=state.theme==="dark"?"light":"dark";applyTheme();saveState()}
+toggleThemeBtn.addEventListener("click",toggleThemeFn);
+</script>
 ⁸<!DOCTYPE html>
 <html lang="gu">
 <head>
