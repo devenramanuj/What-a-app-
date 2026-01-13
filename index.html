@@ -31,7 +31,6 @@
             overflow: hidden;
         }
 
-        /* Header */
         .header {
             background: var(--wa-teal);
             color: white;
@@ -47,7 +46,6 @@
             font-weight: 600;
         }
 
-        /* Main App */
         .app-content {
             display: flex;
             flex: 1;
@@ -81,7 +79,6 @@
             }
         }
 
-        /* Contact List */
         .chat-list {
             flex: 1;
             overflow-y: auto;
@@ -113,7 +110,6 @@
             flex-shrink: 0;
         }
 
-        /* Chat Window */
         .chat-header {
             background: #ededed;
             padding: 10px 15px;
@@ -131,7 +127,6 @@
             flex-direction: column;
         }
 
-        /* Messages */
         .bubble {
             max-width: 75%;
             padding: 8px 12px;
@@ -160,7 +155,6 @@
             margin-top: 4px;
         }
 
-        /* Footer */
         .footer {
             position: fixed;
             bottom: 0;
@@ -187,7 +181,6 @@
             font-weight: bold;
         }
 
-        /* Dropdown */
         .dropdown-content {
             display: none;
             position: absolute;
@@ -210,7 +203,6 @@
             border-bottom: 1px solid #eee;
         }
 
-        /* FAB */
         .fab {
             position: fixed;
             right: 20px;
@@ -228,7 +220,6 @@
             z-index: 120;
         }
 
-        /* Modal */
         .modal {
             position: fixed;
             inset: 0;
@@ -346,11 +337,18 @@ function getCurrentTime() {
 // સ્ટેટ
 let state = JSON.parse(localStorage.getItem('wa_state')) || {
     contacts: [
-        {id: 1, name: "વિધુષી બોટ", phone: "9876543210", lastMsg: "હેલો! હું બોટ છું", lastTime: getCurrentTime()}
+        {id: 1, name: "વિધુષી બોટ", phone: "9876543210", lastMsg: "હેલો! હું બોટ છું", lastTime: getCurrentTime()},
+        {id: 2, name: "દેવેન્દ્ર", phone: "9876543211", lastMsg: "કેમ છો?", lastTime: "10:30 AM"}
     ],
     chats: {
         1: [
-            {id: 1, from: 'them', text: 'હેલો! હું WhatsApp બોટ છું', time: getCurrentTime()}
+            {id: 1, from: 'them', text: 'હેલો! હું WhatsApp બોટ છું', time: getCurrentTime()},
+            {id: 2, from: 'me', text: 'હેલો બોટ!', time: '10:15 AM'},
+            {id: 3, from: 'them', text: 'તમે કેમ છો?', time: '10:16 AM'}
+        ],
+        2: [
+            {id: 1, from: 'them', text: 'કેમ છો?', time: '10:30 AM'},
+            {id: 2, from: 'me', text: 'હું મજામાં છું!', time: '10:31 AM'}
         ]
     }
 };
@@ -361,6 +359,19 @@ let activeChatId = null;
 function renderChatList() {
     const list = document.getElementById('chatList');
     list.innerHTML = '';
+    
+    if (state.contacts.length === 0) {
+        list.innerHTML = `
+            <div style="text-align:center; padding:40px 20px; color:#888;">
+                <div style="font-size:40px; margin-bottom:10px;">💬</div>
+                <p>કોઈ સંપર્ક નથી</p>
+                <button onclick="showAddContactModal()" style="margin-top:15px; padding:8px 15px; background:var(--wa-teal); color:white; border:none; border-radius:20px; cursor:pointer;">
+                    પહેલો સંપર્ક ઉમેરો
+                </button>
+            </div>
+        `;
+        return;
+    }
     
     state.contacts.forEach(c => {
         const row = document.createElement('div');
@@ -404,9 +415,38 @@ function openChat(chatId) {
 // મેસેજ બતાવો
 function renderMsgs() {
     const body = document.getElementById('chatBody');
+    
+    // વેલકમ સ્ક્રીન છુપાવો
+    const welcomeDiv = body.querySelector('div[style*="flex:1"]');
+    if (welcomeDiv) {
+        welcomeDiv.style.display = 'none';
+    }
+    
     body.innerHTML = '';
     
-    (state.chats[activeChatId] || []).forEach(m => {
+    const messages = state.chats[activeChatId] || [];
+    
+    if (messages.length === 0) {
+        body.innerHTML = `
+            <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:20px;">
+                <div class="avatar" style="width:80px; height:80px; margin-bottom:15px; font-size:30px;">
+                    ${state.contacts.find(c => c.id === activeChatId)?.name[0] || '?'}
+                </div>
+                <h3 style="color:#075E54; margin-bottom:10px;">
+                    ${state.contacts.find(c => c.id === activeChatId)?.name || 'અજાણ્યા'}
+                </h3>
+                <p style="color:#666; max-width:300px;">
+                    તમે અને ${state.contacts.find(c => c.id === activeChatId)?.name || 'અજાણ્યા'} વચ્ચે હજી કોઈ મેસેજ નથી.
+                </p>
+                <p style="color:#888; font-size:14px;">
+                    હેલો મેસેજ મોકલીને ચેટ શરૂ કરો!
+                </p>
+            </div>
+        `;
+        return;
+    }
+    
+    messages.forEach(m => {
         const b = document.createElement('div');
         b.className = `bubble ${m.from}`;
         b.innerHTML = `<div>${m.text}</div><div class="m-time">${m.time}</div>`;
@@ -425,7 +465,9 @@ function sendMsg() {
     const time = getCurrentTime();
     if(!state.chats[activeChatId]) state.chats[activeChatId] = [];
     
-    state.chats[activeChatId].push({id: Date.now(), from:'me', text:text, time: time});
+    // મારો મેસેજ ઉમેરો
+    const myMessageId = Date.now();
+    state.chats[activeChatId].push({id: myMessageId, from:'me', text:text, time: time});
     
     const contact = state.contacts.find(c => c.id === activeChatId);
     contact.lastMsg = text;
@@ -438,22 +480,27 @@ function sendMsg() {
     
     // બોટ જવાબ
     if(contact.name.includes('બોટ')) {
-        setTimeout(() => botReply(text, contact.id), 1000);
+        setTimeout(() => receiveBotReply(text, contact.id), 1000);
     }
 }
 
-// બોટ જવાબ
-function botReply(userMsg, contactId) {
+// બોટ જવાબ મેળવો (RECEIVE MESSAGE)
+function receiveBotReply(userMsg, contactId) {
     const replies = {
         'હાય': 'હાય! કેમ છો?',
-        'હેલો': 'હેલો! હું બોટ છું',
-        'કેમ છો': 'હું મજામાં છું',
+        'હેલો': 'હેલો! હું WhatsApp બોટ છું',
+        'કેમ છો': 'હું મજામાં છું! તમે કેમ છો?',
         'નામ': 'મારું નામ વિધુષી બોટ છે',
-        'સમય': `સમય: ${getCurrentTime()}`,
-        'આભાર': 'તમારું સ્વાગત છે'
+        'સમય': `હમણાં સમય છે: ${getCurrentTime()}`,
+        'તારી ઉંમર': 'હું એક કાર્યક્રમ છું, મારી ઉંમર નથી!',
+        'જય શ્રી કૃષ્ણ': 'જય શ્રી કૃષ્ણ! હરિ ભજનમાં સ્વાગત છે.',
+        'આભાર': 'તમારું સ્વાગત છે!',
+        'બાય': 'બાય! ફરી મળીશું.',
+        'સુપ્રભાત': 'સુપ્રભાત! શુભ પ્રભાત.',
+        'શુભ રાત્રી': 'શુભ રાત્રી, સુખદ સ્વપ્નાં.'
     };
     
-    let reply = 'સમજાયું';
+    let reply = 'સમજાયું!';
     const msg = userMsg.toLowerCase();
     
     for(const [key, value] of Object.entries(replies)) {
@@ -463,16 +510,42 @@ function botReply(userMsg, contactId) {
         }
     }
     
+    // જો કોઈ મેચ ન મળે તો રેન્ડમ જવાબ
+    if (reply === 'સમજાયું!') {
+        const randomReplies = [
+            'રસપ્રદ વાત છે!',
+            'તમે તે વિશે વધુ કહી શકો છો?',
+            'મને તમારી વાત સમજાઈ.',
+            'ઓહ, સરસ!',
+            'હા, હું સાંભળી રહ્યો છું.',
+            'તમારો સંદેશ મળ્યો છે.'
+        ];
+        reply = randomReplies[Math.floor(Math.random() * randomReplies.length)];
+    }
+    
     const time = getCurrentTime();
-    state.chats[contactId].push({id: Date.now(), from:'them', text:reply, time: time});
+    
+    // બોટનો મેસેજ ઉમેરો (RECEIVED MESSAGE)
+    const botMessageId = Date.now() + 1;
+    state.chats[contactId].push({id: botMessageId, from:'them', text:reply, time: time});
     
     const contact = state.contacts.find(c => c.id === contactId);
     contact.lastMsg = reply;
     contact.lastTime = time;
     
     saveState();
-    if(activeChatId === contactId) renderMsgs();
+    
+    // જો આ ચેટ ઓપન હોય તો મેસેજ બતાવો
+    if(activeChatId === contactId) {
+        renderMsgs();
+    }
+    
     renderChatList();
+    
+    // નોટિફિકેશન
+    if (activeChatId !== contactId) {
+        alert(`📩 નવો મેસેજ: ${contact.name}\n${reply}`);
+    }
 }
 
 // સંપર્ક ઉમેરો
@@ -489,6 +562,9 @@ function addContact() {
     closeModal('addModal');
     document.getElementById('newName').value = '';
     document.getElementById('newPhone').value = '';
+    
+    // નવો સંપર્ક ખોલો
+    setTimeout(() => openChat(id), 300);
 }
 
 // ડ્રોપડાઉન
@@ -531,6 +607,16 @@ function closeChat() {
     document.getElementById('backBtn').style.display = 'none';
     document.getElementById('messageInputContainer').style.display = 'none';
     activeChatId = null;
+    
+    // વેલકમ સ્ક્રીન ફરી દેખાડો
+    const chatBody = document.getElementById('chatBody');
+    chatBody.innerHTML = `
+        <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:20px;">
+            <div style="font-size:60px; color:#25D366; margin-bottom:20px;">💬</div>
+            <h3 style="color:#075E54; margin-bottom:10px;">WhatsApp Pro</h3>
+            <p style="color:#666; max-width:300px;">ચેટ શરૂ કરવા માટે સંપર્ક પસંદ કરો</p>
+        </div>
+    `;
 }
 
 // કી પ્રેસ
