@@ -2125,6 +2125,564 @@ window.onload = function() {
         testButton.style.display = 'block';
     }
 };
+    <script>
+// ====================
+// મેસેજ સ્ટેટસ સિસ્ટમ
+// ====================
+
+// મેસેજ સ્ટેટસ ટાઈપ્સ
+const MessageStatus = {
+    SENT: 'sent',      // મોકલાયો ✓
+    DELIVERED: 'delivered', // પહોંચ્યો ✓✓ (ગ્રે)
+    READ: 'read'       // વાંચ્યો ✓✓ (વાદળી)
+};
+
+// મેસેજ મોકલતી વખતે
+function sendMsg() {
+    const input = document.getElementById('msgInput');
+    const text = input.value.trim();
+    
+    if (!text || !activeChatId) return;
+    
+    // Create message object with initial status
+    messageIdCounter++;
+    const time = getCurrentTime();
+    const message = {
+        id: messageIdCounter,
+        from: 'me',
+        text: text,
+        time: time,
+        status: MessageStatus.SENT, // પહેલા માત્ર sent
+        timestamp: Date.now()
+    };
+    
+    // Add to chat
+    if (!state.chats[activeChatId]) {
+        state.chats[activeChatId] = [];
+    }
+    state.chats[activeChatId].push(message);
+    
+    // Update contact's last message
+    const contact = state.contacts.find(c => c.id === activeChatId);
+    if (contact) {
+        contact.lastMsg = text;
+        contact.lastTime = time;
+        contact.lastMessageId = messageIdCounter;
+    }
+    
+    // Clear input
+    input.value = '';
+    document.getElementById('sendBtn').disabled = true;
+    
+    // Render messages
+    renderMessages();
+    renderChatList();
+    saveState();
+    
+    // Show sent notification
+    if (state.settings.notifications) {
+        showNotification('મેસેજ મોકલાયો', 'info');
+    }
+    
+    // Simulate delivery after 1-2 seconds
+    setTimeout(() => {
+        updateMessageStatus(messageIdCounter, MessageStatus.DELIVERED);
+    }, 1000 + Math.random() * 1000);
+    
+    // Auto-reply for bot contacts
+    if (contact && contact.name.includes('બોટ')) {
+        setTimeout(() => {
+            autoReply(text, contact.id, messageIdCounter);
+        }, 2000 + Math.random() * 2000);
+    }
+}
+
+// મેસેજ સ્ટેટસ અપડેટ કરવું
+function updateMessageStatus(messageId, newStatus) {
+    if (!activeChatId || !state.chats[activeChatId]) return;
+    
+    const messageIndex = state.chats[activeChatId].findIndex(m => m.id === messageId);
+    if (messageIndex === -1) return;
+    
+    state.chats[activeChatId][messageIndex].status = newStatus;
+    
+    // Update display if this chat is active
+    if (activeChatId) {
+        renderMessages();
+    }
+    
+    // Show notification for read status
+    if (newStatus === MessageStatus.READ) {
+        const contact = state.contacts.find(c => c.id === activeChatId);
+        if (contact && state.settings.notifications) {
+            showNotification(`${contact.name} એ મેસેજ વાંચ્યો`, 'info');
+        }
+    }
+    
+    saveState();
+}
+
+// બોટ જવાબ આપે ત્યારે
+function autoReply(userMessage, contactId, originalMessageId) {
+    const replies = {
+        'હાય': 'હાય! તમે કેમ છો?',
+        'હેલો': 'હેલો! હું WhatsApp Pro બોટ છું.',
+        'કેમ છો': 'હું મજામાં છું! તમે કેમ છો?',
+        'નામ': 'મારું નામ વિધુષી બોટ છે.',
+        'સમય': `હમણાં સમય છે: ${getCurrentTime()}`,
+        'જય શ્રી કૃષ્ણ': 'જય શ્રી કૃષ્ણ! હરિ ભજનમાં સ્વાગત છે.',
+        'આભાર': 'તમારું સ્વાગત છે!',
+        'બાય': 'બાય! ફરી મળીશું.',
+        'સુપ્રભાત': 'સુપ્રભાત! શુભ પ્રભાત.',
+        'શુભ રાત્રી': 'શુભ રાત્રી, સુખદ સ્વપ્નાં.'
+    };
+    
+    const msg = userMessage.toLowerCase();
+    let reply = 'સમજાયું!';
+    
+    for (const [key, value] of Object.entries(replies)) {
+        if (msg.includes(key.toLowerCase())) {
+            reply = value;
+            break;
+        }
+    }
+    
+    // Mark original message as READ when bot sees it
+    setTimeout(() => {
+        updateMessageStatus(originalMessageId, MessageStatus.READ);
+    }, 500);
+    
+    // Add typing indicator
+    showTypingIndicator(contactId);
+    
+    // Send reply after delay
+    setTimeout(() => {
+        messageIdCounter++;
+        const time = getCurrentTime();
+        const botMessage = {
+            id: messageIdCounter,
+            from: 'them',
+            text: reply,
+            time: time,
+            timestamp: Date.now()
+        };
+        
+        if (!state.chats[contactId]) {
+            state.chats[contactId] = [];
+        }
+        state.chats[contactId].push(botMessage);
+        
+        // Update contact
+        const contact = state.contacts.find(c => c.id === contactId);
+        if (contact) {
+            contact.lastMsg = reply;
+            contact.lastTime = time;
+            contact.unread = (contact.unread || 0) + 1;
+        }
+        
+        // Render updates
+        if (activeChatId === contactId) {
+            renderMessages();
+        }
+        renderChatList();
+        saveState();
+    }, 1500);
+}
+
+// મેસેજ રેન્ડર કરતી વખતે સ્ટેટસ દર્શાવવી
+function getStatusIcon(status) {
+    switch(status) {
+        case MessageStatus.SENT:
+            return '<span class="message-status" style="color:#888;">✓</span>';
+        case MessageStatus.DELIVERED:
+            return '<span class="message-status" style="color:#888;">✓✓</span>';
+        case MessageStatus.READ:
+            return '<span class="message-status" style="color:#34B7F1;">✓✓</span>';
+        default:
+            return '<span class="message-status" style="color:#888;">✓</span>';
+    }
+}
+
+// મેસેજ રેન્ડર કરવા માટે અપડેટેડ ફંક્શન
+function renderMessages() {
+    const body = document.getElementById('chatBody');
+    
+    // Hide welcome screen
+    const welcomeScreen = document.getElementById('welcomeScreen');
+    if (welcomeScreen) {
+        welcomeScreen.style.display = 'none';
+    }
+    
+    if (!activeChatId || !state.chats[activeChatId] || state.chats[activeChatId].length === 0) {
+        body.innerHTML = `
+            <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:20px;">
+                <div class="avatar" style="width:80px; height:80px; margin-bottom:15px; font-size:30px;">
+                    ${state.contacts.find(c => c.id === activeChatId)?.avatar || state.contacts.find(c => c.id === activeChatId)?.name[0] || '?'}
+                </div>
+                <h3 style="color:#075E54; margin-bottom:10px;">
+                    ${state.contacts.find(c => c.id === activeChatId)?.name || 'અજાણ્યા'}
+                </h3>
+                <p style="color:#666; max-width:300px; margin-bottom:20px;">
+                    તમે અને ${state.contacts.find(c => c.id === activeChatId)?.name || 'અજાણ્યા'} વચ્ચે હજી કોઈ મેસેજ નથી.
+                </p>
+                <p style="color:#888; font-size:14px;">
+                    હેલો મેસેજ મોકલીને ચેટ શરૂ કરો!
+                </p>
+            </div>
+        `;
+        return;
+    }
+    
+    body.innerHTML = '';
+    
+    const messages = state.chats[activeChatId];
+    let lastDate = null;
+    
+    messages.forEach(msg => {
+        // Add date separator if date changed
+        const msgDate = new Date(msg.timestamp || Date.now()).toDateString();
+        if (msgDate !== lastDate) {
+            const dateSeparator = document.createElement('div');
+            dateSeparator.style.textAlign = 'center';
+            dateSeparator.style.margin = '15px 0';
+            dateSeparator.style.padding = '5px 15px';
+            dateSeparator.style.color = '#666';
+            dateSeparator.style.fontSize = '12px';
+            dateSeparator.style.background = 'rgba(255,255,255,0.7)';
+            dateSeparator.style.borderRadius = '12px';
+            dateSeparator.style.display = 'inline-block';
+            dateSeparator.style.alignSelf = 'center';
+            
+            const date = new Date(msg.timestamp || Date.now());
+            const today = new Date();
+            const yesterday = new Date(today);
+            yesterday.setDate(yesterday.getDate() - 1);
+            
+            let dateText = '';
+            if (date.toDateString() === today.toDateString()) {
+                dateText = 'આજે';
+            } else if (date.toDateString() === yesterday.toDateString()) {
+                dateText = 'ગઇકાલે';
+            } else {
+                dateText = date.toLocaleDateString('gu-IN', { 
+                    day: 'numeric', 
+                    month: 'short',
+                    year: 'numeric'
+                });
+            }
+            
+            dateSeparator.textContent = dateText;
+            body.appendChild(dateSeparator);
+            lastDate = msgDate;
+        }
+        
+        const bubble = document.createElement('div');
+        bubble.className = `bubble ${msg.from}`;
+        bubble.oncontextmenu = (e) => {
+            e.preventDefault();
+            showMessageContextMenu(e, msg.id);
+        };
+        
+        // Get status icon for my messages
+        let statusIcon = '';
+        if (msg.from === 'me') {
+            statusIcon = getStatusIcon(msg.status || MessageStatus.SENT);
+        }
+        
+        const timeWithStatus = msg.from === 'me' ? 
+            `${msg.time} ${statusIcon}` : 
+            msg.time;
+        
+        bubble.innerHTML = `
+            <div>${msg.text}</div>
+            <div class="m-time">${timeWithStatus}</div>
+        `;
+        
+        body.appendChild(bubble);
+    });
+    
+    // Scroll to bottom
+    body.scrollTop = body.scrollHeight;
+    
+    // Mark all messages as read when user opens chat
+    markMessagesAsRead();
+}
+
+// જ્યારે યુઝર ચેટ ખોલે ત્યારે બધા મેસેજ read માર્ક કરવા
+function markMessagesAsRead() {
+    if (!activeChatId || !state.chats[activeChatId]) return;
+    
+    let updated = false;
+    const messages = state.chats[activeChatId];
+    
+    messages.forEach(msg => {
+        if (msg.from === 'them' && (!msg.read || msg.read === false)) {
+            msg.read = true;
+            updated = true;
+        }
+        
+        // Mark my messages as read by recipient if they're online
+        if (msg.from === 'me' && msg.status === MessageStatus.DELIVERED) {
+            const contact = state.contacts.find(c => c.id === activeChatId);
+            if (contact && contact.status === 'online') {
+                // Simulate recipient reading the message
+                setTimeout(() => {
+                    updateMessageStatus(msg.id, MessageStatus.READ);
+                }, 500 + Math.random() * 1000);
+            }
+        }
+    });
+    
+    if (updated) {
+        saveState();
+    }
+}
+
+// સંપર્ક ખોલતી વખતે યુનરીડ મેસેજ રીસેટ
+function openChat(chatId) {
+    activeChatId = chatId;
+    const contact = state.contacts.find(c => c.id === chatId);
+    
+    if (!contact) return;
+    
+    // Update header
+    document.getElementById('chatName').textContent = contact.name;
+    document.getElementById('chatNum').textContent = contact.phone;
+    document.getElementById('chatAvatar').textContent = contact.avatar || contact.name[0];
+    
+    // Update status
+    let statusText = '';
+    if (contact.status === 'online') {
+        statusText = '<div class="online-dot"></div> ઓનલાઇન';
+        
+        // Mark all delivered messages as read (since contact is online and viewing chat)
+        setTimeout(() => {
+            if (state.chats[chatId]) {
+                state.chats[chatId].forEach(msg => {
+                    if (msg.from === 'me' && msg.status === MessageStatus.DELIVERED) {
+                        updateMessageStatus(msg.id, MessageStatus.READ);
+                    }
+                });
+            }
+        }, 800);
+        
+    } else if (contact.status === 'lastSeen') {
+        statusText = `🕐 છેલ્લો જોયેલ ${contact.lastTime}`;
+    } else {
+        statusText = '⚫ ઑફલાઇન';
+    }
+    document.getElementById('chatStatus').innerHTML = statusText;
+    
+    // Reset unread count
+    const previousUnread = contact.unread || 0;
+    contact.unread = 0;
+    
+    // Show typing indicator for bot
+    if (contact.name.includes('બોટ') && previousUnread > 0) {
+        setTimeout(() => {
+            showTypingIndicator(chatId);
+        }, 500);
+    }
+    
+    // Mobile view handling
+    if (window.innerWidth <= 900) {
+        document.getElementById('sidebar').classList.add('hidden');
+        document.getElementById('chatPanel').classList.add('active');
+        document.getElementById('backBtn').style.display = 'block';
+    }
+    
+    // Show message input
+    document.getElementById('messageInputContainer').style.display = 'flex';
+    document.getElementById('msgInput').focus();
+    
+    // Hide welcome screen
+    document.getElementById('welcomeScreen').style.display = 'none';
+    
+    // Render messages
+    renderMessages();
+    
+    // Update chat list
+    renderChatList();
+    
+    // Save state
+    saveState();
+}
+
+// ====================
+// REALISTIC STATUS UPDATES
+// ====================
+
+// સંપર્કોનો સ્ટેટસ રેન્ડમલી અપડેટ કરવો
+function updateRandomStatus() {
+    if (!state.contacts || state.contacts.length === 0) return;
+    
+    state.contacts.forEach(contact => {
+        if (contact.id === activeChatId) return; // Don't change active chat status
+        
+        // Random status changes
+        const random = Math.random();
+        if (random < 0.3) { // 30% chance to change status
+            if (contact.status === 'online') {
+                contact.status = 'lastSeen';
+                contact.lastTime = getCurrentTime();
+            } else if (contact.status === 'lastSeen') {
+                contact.status = Math.random() > 0.5 ? 'online' : 'offline';
+            } else if (contact.status === 'offline') {
+                contact.status = Math.random() > 0.7 ? 'online' : 'lastSeen';
+                contact.lastTime = getCurrentTime();
+            }
+            
+            // Update last seen time
+            if (contact.status === 'lastSeen') {
+                contact.lastTime = getCurrentTime();
+            }
+        }
+    });
+    
+    // Update display if any contact list is visible
+    renderChatList();
+    saveState();
+}
+
+// મેસેજ વાંચ્યાનો સિમ્યુલેશન
+function simulateMessageReading() {
+    if (!activeChatId || !state.chats[activeChatId]) return;
+    
+    const contact = state.contacts.find(c => c.id === activeChatId);
+    if (!contact || contact.status !== 'online') return;
+    
+    // Find undelivered messages from me
+    const myMessages = state.chats[activeChatId].filter(msg => 
+        msg.from === 'me' && 
+        msg.status === MessageStatus.DELIVERED
+    );
+    
+    if (myMessages.length > 0) {
+        // Randomly mark one as read
+        const randomMsg = myMessages[Math.floor(Math.random() * myMessages.length)];
+        setTimeout(() => {
+            updateMessageStatus(randomMsg.id, MessageStatus.READ);
+        }, 500 + Math.random() * 2000);
+    }
+}
+
+// ====================
+// INITIALIZATION
+// ====================
+function initializeApp() {
+    // Load initial sample data if empty
+    if (state.contacts.length === 0) {
+        loadSampleData();
+    }
+    
+    // Apply settings
+    applySettings();
+    
+    // Render UI
+    renderChatList();
+    updateDataCount();
+    
+    // Set up event listeners
+    setupEventListeners();
+    
+    // Start status update intervals
+    setInterval(updateRandomStatus, 30000); // Update status every 30 seconds
+    setInterval(simulateMessageReading, 10000); // Check for message reading every 10 seconds
+    
+    // Show welcome message
+    console.log('WhatsApp Pro v3.1 initialized with realistic message status!');
+    console.log('✓ = મોકલાયો');
+    console.log('✓✓ (ગ્રે) = પહોંચ્યો');
+    console.log('✓✓ (વાદળી) = વાંચ્યો');
+}
+
+// ====================
+// ENHANCED SAMPLE DATA
+// ====================
+function loadSampleData() {
+    state.contacts = [
+        {
+            id: 1,
+            name: "વિધુષી બોટ",
+            phone: "98765 43210",
+            lastMsg: "હેલો! હું WhatsApp Pro બોટ છું.",
+            lastTime: getCurrentTime(),
+            status: "online",
+            unread: 3,
+            avatar: "V"
+        },
+        {
+            id: 2,
+            name: "રમેશભાઈ",
+            phone: "98765 43211",
+            lastMsg: "મીટિંગ માટે થેંક્યુ",
+            lastTime: "10:30 AM",
+            status: "lastSeen",
+            unread: 2,
+            avatar: "R"
+        },
+        {
+            id: 3,
+            name: "સીતાબેન",
+            phone: "98765 43212",
+            lastMsg: "કાલે મળીશું",
+            lastTime: "ગઈકાલે",
+            status: "offline",
+            unread: 1,
+            avatar: "S"
+        }
+    ];
+
+    state.chats = {
+        1: [
+            { 
+                id: 1, 
+                from: 'them', 
+                text: 'હેલો! હું WhatsApp Pro બોટ છું.', 
+                time: '10:00 AM',
+                timestamp: Date.now() - 3600000,
+                read: true
+            },
+            { 
+                id: 2, 
+                from: 'me', 
+                text: 'હેલો! કેમ છો?', 
+                time: '10:01 AM',
+                timestamp: Date.now() - 3540000,
+                status: MessageStatus.READ
+            },
+            { 
+                id: 3, 
+                from: 'them', 
+                text: 'હું મજામાં છું! તમને કેવી મદદ કરી શકું?', 
+                time: '10:02 AM',
+                timestamp: Date.now() - 3480000,
+                read: true
+            }
+        ],
+        2: [
+            { 
+                id: 4, 
+                from: 'them', 
+                text: 'કાલની મીટિંગ માટે થેંક્યુ', 
+                time: 'ગઈકાલે 3:45 PM',
+                timestamp: Date.now() - 86400000,
+                read: true
+            },
+            { 
+                id: 5, 
+                from: 'me', 
+                text: 'તમારું સ્વાગત છે! મીટિંગ શી હતી?', 
+                time: 'આજે 10:15 AM',
+                timestamp: Date.now() - 3600000,
+                status: MessageStatus.DELIVERED
+            }
+        ]
+    };
+
+    saveState();
+}
+</script>
 </script>
 </body>
 </html>
