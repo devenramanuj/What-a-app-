@@ -5,107 +5,786 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
 <title>WhatsApp Pro - Real Time</title>
 <style>
-:root{--wa-teal:#075E54;--wa-green:#25D366;--bg:#e5ddd5;--white:#ffffff;--text:#111;--muted:#667;}
-*{box-sizing:border-box;margin:0;padding:0;}
-body{font-family: 'Segoe UI', sans-serif; background:#f0f2f5; height:100vh; display:flex; flex-direction:column; overflow:hidden;}
+:root {
+    --wa-teal: #075E54;
+    --wa-green: #25D366;
+    --bg: #e5ddd5;
+    --white: #ffffff;
+    --text: #111;
+    --muted: #667;
+    --shadow: 0 2px 5px rgba(0,0,0,0.1);
+    --bubble-me: #dcf8c6;
+    --bubble-them: #ffffff;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Segoe UI', 'Noto Sans Gujarati', sans-serif;
+    background: #f0f2f5;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    color: var(--text);
+}
 
 /* Header */
-.header{background:var(--wa-teal); color:white; padding:15px; display:flex; justify-content:space-between; align-items:center; flex-shrink:0; z-index:100;}
-.header h2{font-size:20px; font-weight:600;}
+.header {
+    background: var(--wa-teal);
+    background: linear-gradient(to right, var(--wa-teal), #128C7E);
+    color: white;
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+    z-index: 100;
+    box-shadow: var(--shadow);
+}
+
+.header h2 {
+    font-size: 22px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.header-actions {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+
+.header-actions i {
+    cursor: pointer;
+    font-size: 20px;
+}
 
 /* Main App Area */
-.app-content{display:flex; flex:1; overflow:hidden; position:relative;}
-.sidebar{width:360px; background:white; border-right:1px solid #ddd; display:flex; flex-direction:column;}
-@media(max-width:900px){ .sidebar{width:100%;} .chat-window{display:none; position:fixed; inset:0; z-index:200;} }
+.app-content {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+    position: relative;
+}
+
+.sidebar {
+    width: 360px;
+    background: white;
+    border-right: 1px solid #ddd;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s ease;
+    z-index: 1;
+}
+
+.chat-window {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png');
+    background-color: var(--bg);
+    background-size: contain;
+}
+
+@media (max-width: 900px) {
+    .sidebar {
+        width: 100%;
+    }
+    
+    .chat-window {
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 200;
+        background: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png');
+    }
+    
+    .chat-window.active {
+        display: flex;
+    }
+    
+    .sidebar.hidden {
+        transform: translateX(-100%);
+    }
+}
 
 /* Contact List */
-.chat-list{flex:1; overflow-y:auto; padding-bottom:70px;}
-.chat-row{display:flex; align-items:center; padding:12px 15px; border-bottom:1px solid #f6f6f6; cursor:pointer;}
-.chat-row:hover{background:#f5f5f5;}
-.avatar{width:50px; height:50px; border-radius:50%; background:#128c7e; color:white; display:grid; place-items:center; font-weight:bold; margin-right:15px; flex-shrink:0;}
+.chat-list {
+    flex: 1;
+    overflow-y: auto;
+    padding-bottom: 70px;
+}
+
+.chat-row {
+    display: flex;
+    align-items: center;
+    padding: 12px 15px;
+    border-bottom: 1px solid #f6f6f6;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.chat-row:hover {
+    background: #f5f5f5;
+}
+
+.chat-row.active {
+    background: #e8f5e8;
+}
+
+.avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #128c7e, #075E54);
+    color: white;
+    display: grid;
+    place-items: center;
+    font-weight: bold;
+    margin-right: 15px;
+    flex-shrink: 0;
+    font-size: 18px;
+}
+
+.chat-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.chat-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4px;
+}
+
+.chat-name {
+    font-weight: 600;
+    font-size: 16px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.chat-time {
+    font-size: 12px;
+    color: #888;
+}
+
+.chat-preview {
+    color: #666;
+    font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.unread-badge {
+    background: var(--wa-green);
+    color: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    font-size: 12px;
+    display: grid;
+    place-items: center;
+    margin-left: auto;
+    margin-right: 10px;
+}
 
 /* Chat Window */
-.chat-window{flex:1; display:flex; flex-direction:column; background:url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); background-color:var(--bg);}
-.chat-header{background:#ededed; padding:10px 15px; display:flex; align-items:center; border-bottom:1px solid #ddd; height:60px;}
-.chat-body{flex:1; overflow-y:auto; padding:20px; display:flex; flex-direction:column;}
+.chat-header {
+    background: #ededed;
+    padding: 10px 15px;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid #ddd;
+    min-height: 60px;
+}
+
+.back-btn {
+    border: none;
+    background: none;
+    font-size: 20px;
+    margin-right: 10px;
+    display: none;
+    cursor: pointer;
+    color: var(--wa-teal);
+}
+
+.chat-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
 
 /* Messages */
-.bubble{max-width:75%; padding:8px 12px; border-radius:10px; margin-bottom:10px; font-size:14.5px; position:relative; box-shadow:0 1px 1px rgba(0,0,0,0.1);}
-.me{align-self:flex-end; background:#dcf8c6; border-top-right-radius:2px;}
-.them{align-self:flex-start; background:white; border-top-left-radius:0;}
-.m-time{font-size:10px; color:#888; text-align:right; margin-top:4px; display:block;}
+.bubble {
+    max-width: 75%;
+    padding: 10px 15px;
+    border-radius: 18px;
+    margin-bottom: 5px;
+    font-size: 15px;
+    position: relative;
+    box-shadow: 0 1px 1px rgba(0,0,0,0.1);
+    line-height: 1.4;
+    word-break: break-word;
+}
+
+.me {
+    align-self: flex-end;
+    background: var(--bubble-me);
+    border-bottom-right-radius: 4px;
+    animation: slideInRight 0.3s ease;
+}
+
+.them {
+    align-self: flex-start;
+    background: var(--bubble-them);
+    border-bottom-left-radius: 4px;
+    animation: slideInLeft 0.3s ease;
+}
+
+.m-time {
+    font-size: 11px;
+    color: #666;
+    text-align: right;
+    margin-top: 4px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 5px;
+}
+
+.message-status {
+    font-size: 14px;
+}
+
+.typing-indicator {
+    display: flex;
+    gap: 4px;
+    padding: 10px 15px;
+    background: white;
+    border-radius: 18px;
+    align-self: flex-start;
+    width: fit-content;
+    margin-bottom: 10px;
+}
+
+.typing-dot {
+    width: 8px;
+    height: 8px;
+    background: #999;
+    border-radius: 50%;
+    animation: typing 1.4s infinite;
+}
+
+.typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.typing-dot:nth-child(3) { animation-delay: 0.4s; }
 
 /* Footer & Menu */
-.footer{position:fixed; bottom:0; width:100%; background:white; display:flex; border-top:1px solid #ddd; padding:10px 0; z-index:150;}
-.nav-item{flex:1; text-align:center; color:var(--muted); font-size:12px; cursor:pointer; background:none; border:none;}
-.nav-item.active{color:var(--wa-teal); font-weight:bold;}
+.footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    background: white;
+    display: flex;
+    border-top: 1px solid #ddd;
+    padding: 10px 0;
+    z-index: 150;
+    box-shadow: 0 -2px 5px rgba(0,0,0,0.05);
+}
+
+.nav-item {
+    flex: 1;
+    text-align: center;
+    color: var(--muted);
+    font-size: 12px;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 8px 0;
+    transition: color 0.3s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.nav-item i {
+    font-size: 20px;
+}
+
+.nav-item:hover {
+    color: var(--wa-teal);
+}
+
+.nav-item.active {
+    color: var(--wa-teal);
+    font-weight: bold;
+}
 
 /* Dropdown */
-.dropdown-content{display:none; position:absolute; right:10px; top:50px; background:white; min-width:160px; box-shadow:0 8px 16px rgba(0,0,0,0.2); z-index:300; border-radius:4px; overflow:hidden;}
-.dropdown-content a{color:black; padding:12px 16px; text-decoration:none; display:block; font-size:14px; border-bottom:1px solid #eee;}
+.dropdown-content {
+    display: none;
+    position: absolute;
+    right: 10px;
+    top: 50px;
+    background: white;
+    min-width: 180px;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+    z-index: 300;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.dropdown-content a {
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+    font-size: 14px;
+    border-bottom: 1px solid #eee;
+    transition: background 0.2s;
+}
+
+.dropdown-content a:hover {
+    background: #f5f5f5;
+}
+
+.dropdown-content a i {
+    margin-right: 10px;
+    width: 20px;
+    text-align: center;
+}
 
 /* FAB */
-.fab{position:fixed; right:20px; bottom:80px; width:55px; height:55px; background:var(--wa-green); border-radius:50%; color:white; display:grid; place-items:center; font-size:24px; box-shadow:0 4px 10px rgba(0,0,0,0.3); cursor:pointer; z-index:120;}
+.fab {
+    position: fixed;
+    right: 20px;
+    bottom: 80px;
+    width: 55px;
+    height: 55px;
+    background: var(--wa-green);
+    border-radius: 50%;
+    color: white;
+    display: grid;
+    place-items: center;
+    font-size: 28px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    cursor: pointer;
+    z-index: 120;
+    border: none;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.fab:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.4);
+}
 
 /* Modal */
-.modal{position:fixed; inset:0; background:rgba(0,0,0,0.6); display:none; align-items:center; justify-content:center; z-index:500;}
-.modal-box{background:white; padding:20px; border-radius:10px; width:90%; max-width:350px;}
-.modal-box input{width:100%; padding:10px; margin:10px 0; border:1px solid #ddd; border-radius:5px;}
+.modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 500;
+}
+
+.modal-box {
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 380px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    animation: modalOpen 0.3s ease;
+}
+
+.modal-title {
+    margin-bottom: 20px;
+    color: var(--wa-teal);
+    text-align: center;
+}
+
+.modal-box input, .modal-box select {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 15px;
+    transition: border 0.3s;
+}
+
+.modal-box input:focus, .modal-box select:focus {
+    outline: none;
+    border-color: var(--wa-teal);
+}
+
+.modal-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.btn-primary {
+    flex: 1;
+    padding: 12px;
+    background: var(--wa-teal);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.btn-primary:hover {
+    background: #054d44;
+}
+
+.btn-secondary {
+    flex: 1;
+    padding: 12px;
+    background: #f0f0f0;
+    color: #555;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.btn-secondary:hover {
+    background: #e0e0e0;
+}
+
+/* Search */
+.search-container {
+    padding: 15px;
+    background: white;
+    border-bottom: 1px solid #eee;
+}
+
+.search-box {
+    width: 100%;
+    padding: 12px 20px;
+    border-radius: 25px;
+    border: none;
+    background: #f0f2f5;
+    font-size: 15px;
+    outline: none;
+    transition: background 0.3s;
+}
+
+.search-box:focus {
+    background: #e8e8e8;
+}
+
+/* Message Input */
+.message-input-container {
+    padding: 10px;
+    background: #f0f0f0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-top: 1px solid #ddd;
+}
+
+.message-input {
+    flex: 1;
+    padding: 12px 20px;
+    border-radius: 25px;
+    border: 1px solid #ddd;
+    outline: none;
+    font-size: 15px;
+    background: white;
+    transition: border 0.3s;
+}
+
+.message-input:focus {
+    border-color: var(--wa-teal);
+}
+
+.send-btn {
+    background: var(--wa-teal);
+    color: white;
+    border: none;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    font-size: 22px;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    transition: background 0.3s;
+}
+
+.send-btn:hover {
+    background: #054d44;
+}
+
+/* Animations */
+@keyframes slideInRight {
+    from { transform: translateX(30px); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes slideInLeft {
+    from { transform: translateX(-30px); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes typing {
+    0%, 60%, 100% { transform: translateY(0); }
+    30% { transform: translateY(-5px); }
+}
+
+@keyframes modalOpen {
+    from { transform: scale(0.9); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+/* Welcome Screen */
+.welcome-screen {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: white;
+    padding: 20px;
+    text-align: center;
+}
+
+.welcome-icon {
+    font-size: 80px;
+    color: var(--wa-green);
+    margin-bottom: 20px;
+}
+
+.welcome-text {
+    font-size: 18px;
+    color: #666;
+    margin-bottom: 30px;
+    max-width: 400px;
+}
+
+/* Empty state */
+.empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: #888;
+}
+
+.empty-state i {
+    font-size: 50px;
+    margin-bottom: 15px;
+    color: #ccc;
+}
+
+/* Online Status */
+.online-status {
+    display: flex;
+    align-items: center;
+    font-size: 12px;
+    color: #666;
+    margin-top: 2px;
+}
+
+.online-dot {
+    width: 8px;
+    height: 8px;
+    background: var(--wa-green);
+    border-radius: 50%;
+    margin-right: 5px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+    .bubble {
+        max-width: 85%;
+    }
+    
+    .header h2 {
+        font-size: 18px;
+    }
+    
+    .modal-box {
+        width: 95%;
+        padding: 20px;
+    }
+}
+
+/* Dark mode support (optional) */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --bg: #0a0a0a;
+        --white: #1a1a1a;
+        --text: #eee;
+        --muted: #aaa;
+    }
+    
+    .sidebar, .modal-box, .dropdown-content {
+        background: #1a1a1a;
+        color: #eee;
+    }
+    
+    .chat-row:hover {
+        background: #2a2a2a;
+    }
+    
+    .bubble.them {
+        background: #2a2a2a;
+        color: #eee;
+    }
+}
 </style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
 
 <header class="header">
-    <h2>WhatsApp</h2>
-    <div style="position:relative;">
-        <span onclick="toggleDropdown()" style="cursor:pointer; font-size:22px; padding:0 10px;">⋮</span>
-        <div id="dropdownMenu" class="dropdown-content">
-            <a href="#" onclick="alert('Devendrabhai | Vidushi Bot v3.0')">પ્રોફાઇલ</a>
-            <a href="#" onclick="location.reload()">રીફ્રેશ એપ</a>
-            <a href="#" onclick="if(confirm('બધી ચેટ ભૂંસી નાખવી છે?')){localStorage.clear(); location.reload();}">ડેટા ક્લિયર</a>
+    <h2><i class="fab fa-whatsapp"></i> WhatsApp Pro</h2>
+    <div class="header-actions">
+        <i class="fas fa-search" onclick="toggleSearch()"></i>
+        <div style="position:relative;">
+            <i class="fas fa-ellipsis-v" onclick="toggleDropdown()"></i>
+            <div id="dropdownMenu" class="dropdown-content">
+                <a href="#" onclick="showProfile()"><i class="fas fa-user"></i> પ્રોફાઇલ</a>
+                <a href="#" onclick="location.reload()"><i class="fas fa-sync-alt"></i> રીફ્રેશ એપ</a>
+                <a href="#" onclick="showArchived()"><i class="fas fa-archive"></i> આર્કાઇવ્ડ ચેટ્સ</a>
+                <a href="#" onclick="clearData()"><i class="fas fa-trash"></i> ડેટા ક્લિયર</a>
+            </div>
         </div>
     </div>
 </header>
 
 <div class="app-content">
-    <section class="sidebar">
-        <div style="padding:10px;"><input type="text" placeholder="સર્ચ કરો..." style="width:100%; padding:10px; border-radius:20px; border:none; background:#f0f2f5; outline:none;"></div>
-        <div class="chat-list" id="chatList"></div>
+    <section class="sidebar" id="sidebar">
+        <div class="search-container" id="searchContainer" style="display:none;">
+            <input type="text" class="search-box" id="searchInput" placeholder="સંપર્કો અને મેસેજ સર્ચ કરો..." onkeyup="filterChats()">
+            <button onclick="toggleSearch()" style="margin-top:10px; width:100%; padding:8px; background:#f0f0f0; border:none; border-radius:8px;">બંધ કરો</button>
+        </div>
+        
+        <div class="chat-list" id="chatList">
+            <!-- Chat list will be generated by JavaScript -->
+        </div>
     </section>
 
     <section class="chat-window" id="chatPanel">
         <div class="chat-header">
-            <button onclick="closeChat()" id="backBtn" style="border:none; background:none; font-size:20px; margin-right:10px; display:none;">←</button>
-            <div id="chatAvatar" class="avatar" style="width:40px; height:40px; font-size:16px;">?</div>
+            <button class="back-btn" id="backBtn" onclick="closeChat()"><i class="fas fa-arrow-left"></i></button>
+            <div id="chatAvatar" class="avatar">?</div>
             <div style="flex:1">
-                <b id="chatName" style="font-size:16px;">ચેટ પસંદ કરો</b><br>
-                <small id="chatNum" style="color:#666; font-size:11px;"></small>
+                <b id="chatName" style="font-size:17px;">ચેટ પસંદ કરો</b><br>
+                <div class="online-status" id="chatStatus">
+                    <span id="chatNum" style="font-size:13px; color:#666;">ચેટ શરૂ કરવા માટે સંપર્ક પસંદ કરો</span>
+                </div>
+            </div>
+            <div style="display:flex; gap:15px;">
+                <i class="fas fa-phone-alt" style="color:#075E54; cursor:pointer;" onclick="alert('કૉલ ફીચર ટૂંક સમયમાં આવશે')"></i>
+                <i class="fas fa-video" style="color:#075E54; cursor:pointer;" onclick="alert('વીડિઓ કૉલ ફીચર ટૂંક સમયમાં આવશે')"></i>
             </div>
         </div>
-        <div class="chat-body" id="chatBody"></div>
-        <div style="padding:10px; background:#f0f0f0; display:flex; align-items:center; gap:10px;">
-            <input type="text" id="msgInput" placeholder="મેસેજ ટાઈપ કરો" style="flex:1; padding:12px; border-radius:25px; border:none; outline:none;">
-            <button onclick="sendMsg()" style="background:var(--wa-teal); color:white; border:none; width:45px; height:45px; border-radius:50%; font-size:20px; cursor:pointer;">➤</button>
+        
+        <div class="chat-body" id="chatBody">
+            <!-- Welcome screen when no chat is selected -->
+            <div class="welcome-screen" id="welcomeScreen">
+                <div class="welcome-icon">
+                    <i class="fab fa-whatsapp"></i>
+                </div>
+                <h2 style="color:#075E54; margin-bottom:15px;">WhatsApp Pro માં આપનું સ્વાગત છે</h2>
+                <p class="welcome-text">તમારા મિત્રો અને પરિવાર સાથે મેસેજ કરવા માટે ડાબી બાજુથી સંપર્ક પસંદ કરો અથવા નવો સંપર્ક ઉમેરો.</p>
+                <button class="btn-primary" onclick="showAddContactModal()" style="padding:12px 30px; border-radius:25px;">
+                    <i class="fas fa-user-plus"></i> નવો સંપર્ક ઉમેરો
+                </button>
+            </div>
+        </div>
+        
+        <div class="message-input-container" id="messageInputContainer" style="display:none;">
+            <i class="fas fa-smile" style="font-size:22px; color:#666; cursor:pointer;" onclick="alert('ઇમોજી ફીચર ટૂંક સમયમાં આવશે')"></i>
+            <input type="text" class="message-input" id="msgInput" placeholder="મેસેજ ટાઈપ કરો..." onkeypress="handleKeyPress(event)">
+            <i class="fas fa-paperclip" style="font-size:22px; color:#666; cursor:pointer;" onclick="alert('એટેચમેન્ટ ફીચર ટૂંક સમયમાં આવશે')"></i>
+            <button class="send-btn" onclick="sendMsg()">
+                <i class="fas fa-paper-plane"></i>
+            </button>
         </div>
     </section>
 </div>
 
-<div class="fab" onclick="document.getElementById('addModal').style.display='flex'">+</div>
+<button class="fab" onclick="showAddContactModal()">
+    <i class="fas fa-comment-medical"></i>
+</button>
 
 <nav class="footer">
-    <button class="nav-item active">💬<br>ચેટ</button>
-    <button class="nav-item" onclick="alert('અપડેટ ફીચર ટૂંક સમયમાં આવશે')">🔔<br>અપડેટ</button>
-    <button class="nav-item" onclick="alert('કોમ્યુનિટી ફીચર ટૂંક સમયમાં આવશે')">👥<br>કોમ્યુનિટી</button>
-    <button class="nav-item" onclick="alert('સેટિંગ્સ: Devendrabhai Edition')">⚙️<br>સેટિંગ્સ</button>
+    <button class="nav-item active" onclick="showChats()">
+        <i class="fas fa-comments"></i>
+        <span>ચેટ</span>
+    </button>
+    <button class="nav-item" onclick="showUpdates()">
+        <i class="fas fa-bell"></i>
+        <span>અપડેટ</span>
+    </button>
+    <button class="nav-item" onclick="showCommunities()">
+        <i class="fas fa-users"></i>
+        <span>કોમ્યુનિટી</span>
+    </button>
+    <button class="nav-item" onclick="showSettings()">
+        <i class="fas fa-cog"></i>
+        <span>સેટિંગ્સ</span>
+    </button>
 </nav>
 
+<!-- Add Contact Modal -->
 <div id="addModal" class="modal">
     <div class="modal-box">
-        <h3>નવો સંપર્ક ઉમેરો</h3>
-        <input type="text" id="newName" placeholder="નામ">
-        <input type="text" id="newPhone" placeholder="મોબાઇલ નંબર">
-        <button onclick="addContact()" style="width:100%; padding:12px; background:var(--wa-teal); color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">સેવ કરો</button>
-        <button onclick="document.getElementById('addModal').style.display='none'" style="width:100%; padding:10px; border:none; color:red; margin-top:5px; background:none; cursor:pointer;">રદ કરો</button>
+        <h3 class="modal-title"><i class="fas fa-user-plus"></i> નવો સંપર્ક ઉમેરો</h3>
+        <input type="text" id="newName" placeholder="સંપર્કનું નામ" autofocus>
+        <input type="text" id="newPhone" placeholder="મોબાઇલ નંબર (+91 લખવાની જરૂર નથી)">
+        <select id="newStatus">
+            <option value="online">ઓનલાઇન</option>
+            <option value="offline">ઑફલાઇન</option>
+            <option value="lastSeen">છેલ્લો જોયેલ</option>
+        </select>
+        <div class="modal-actions">
+            <button class="btn-primary" onclick="addContact()">સંપર્ક ઉમેરો</button>
+            <button class="btn-secondary" onclick="closeModal('addModal')">રદ કરો</button>
+        </div>
+    </div>
+</div>
+
+<!-- Profile Modal -->
+<div id="profileModal" class="modal">
+    <div class="modal-box">
+        <h3 class="modal-title"><i class="fas fa-user-circle"></i> તમારી પ્રોફાઇલ</h3>
+        <div style="text-align:center; margin:20px 0;">
+            <div class="avatar" style="width:80px; height:80px; margin:0 auto 15px; font-size:30px;">
+                <i class="fas fa-user"></i>
+            </div>
+            <h3>દેવેન્દ્રભાઈ | Vidushi Bot v3.0</h3>
+            <p style="color:#666; margin-top:10px;">WhatsApp Pro એપ્લિકેશન ડેવલપર</p>
+        </div>
+        <div class="modal-actions">
+            <button class="btn-secondary" onclick="closeModal('profileModal')">બંધ કરો</button>
+        </div>
     </div>
 </div>
 
@@ -122,98 +801,529 @@ function getCurrentTime() {
     return hours + ':' + minutes + ' ' + ampm;
 }
 
-let state = JSON.parse(localStorage.getItem('wa_final_dynamic')) || {
-    contacts: [{id:1, name:"દેવેન્દ્રભાઈ", phone:"9876543210", lastMsg:"જય શ્રી કૃષ્ણ", lastTime: getCurrentTime()}],
-    chats: {1:[]}
-};
-let activeId = null;
+// આપોઆપ જવાબ મોકલવા માટેનું ફંક્શન
+function getAutoReply(message) {
+    const msg = message.toLowerCase();
+    
+    const replies = {
+        'હાય': 'હાય! તમે કેમ છો?',
+        'હેલો': 'હેલો! હું WhatsApp Pro બોટ છું. તમને કેવી મદદ કરી શકું?',
+        'કેમ છો': 'હું મજામાં છું! તમે કેમ છો?',
+        'શુ કરો છો': 'તમારા મેસેજની રાહ જોઈ રહ્યો છું!',
+        'તમારું નામ': 'મારું નામ WhatsApp Pro બોટ છે',
+        'સમય': 'હમણાં સમય છે: ' + getCurrentTime(),
+        'તારી ઉંમર': 'મારી ઉંમર તો કહેવાય નહીં, હું તો એક કાર્યક્રમ છું',
+        'જય શ્રી કૃષ્ણ': 'જય શ્રી કૃષ્ણ! હરિ ભજનમાં તમારું સ્વાગત છે',
+        'આભાર': 'તમારું સ્વાગત છે!',
+        'બાય': 'બાય! મળ્યા છીએ ફરી',
+        'સુપ્રભાત': 'સુપ્રભાત! શુભ પ્રભાત',
+        'શુભ રાત્રી': 'શુભ રાત્રી, સ્વપ્નામાં મળીએ'
+    };
+    
+    for (const [key, value] of Object.entries(replies)) {
+        if (msg.includes(key)) {
+            return value;
+        }
+    }
+    
+    // જો કોઈ મેચ ન મળે તો રેન્ડમ જવાબ
+    const randomReplies = [
+        'સમજાયું!',
+        'રસપ્રદ વાત છે.',
+        'તમે તે વિશે વધુ કહી શકો છો?',
+        'મને તમારી વાત સમજાઈ.',
+        'ઓહ, સરસ!',
+        'આગળ શું?',
+        'હા, હું સાંભળી રહ્યો છું.',
+        'તમારો સંદેશ મળ્યો છે.'
+    ];
+    
+    return randomReplies[Math.floor(Math.random() * randomReplies.length)];
+}
 
-function renderList() {
+// એપ્લિકેશન સ્ટેટ
+let state = JSON.parse(localStorage.getItem('wa_pro_state')) || {
+    contacts: [
+        {id: 1, name: "દેવેન્દ્રભાઈ", phone: "98765 43210", lastMsg: "જય શ્રી કૃષ્ણ", lastTime: getCurrentTime(), status: "online", unread: 0},
+        {id: 2, name: "વિધુષી", phone: "98765 43211", lastMsg: "હેલો, કેમ છો?", lastTime: "10:30 AM", status: "online", unread: 2},
+        {id: 3, name: "રમેશભાઈ", phone: "98765 43212", lastMsg: "મીટિંગ માટે થેંક્યુ", lastTime: "ગઈકાલે", status: "lastSeen", unread: 0},
+        {id: 4, name: "સીતાબેન", phone: "98765 43213", lastMsg: "શું તમે ઘરે છો?", lastTime: "09:45 AM", status: "offline", unread: 1},
+        {id: 5, name: "જીગારભાઈ", phone: "98765 43214", lastMsg: "કાલે મળીશું", lastTime: "સોમવાર", status: "online", unread: 0}
+    ],
+    chats: {
+        1: [
+            {id: 1, from: 'them', text: 'જય શ્રી કૃષ્ણ', time: '10:15 AM'},
+            {id: 2, from: 'me', text: 'જય શ્રી કૃષ્ણ! કેમ છો?', time: '10:16 AM'},
+            {id: 3, from: 'them', text: 'સરસ છું, તમે કેમ છો?', time: '10:17 AM'}
+        ],
+        2: [
+            {id: 1, from: 'them', text: 'હેલો, કેમ છો?', time: '10:30 AM'},
+            {id: 2, from: 'me', text: 'હું મજામાં છું! તમે?', time: '10:32 AM'}
+        ],
+        3: [
+            {id: 1, from: 'me', text: 'મીટિંગ માટે થેંક્યુ', time: 'ગઈકાલે 3:45 PM'},
+            {id: 2, from: 'them', text: 'તમારું સ્વાગત છે', time: 'ગઈકાલે 4:00 PM'}
+        ],
+        4: [
+            {id: 1, from: 'them', text: 'શું તમે ઘરે છો?', time: 'આજે 09:45 AM'}
+        ],
+        5: [
+            {id: 1, from: 'me', text: 'કાલે મળીશું', time: 'સોમવાર 2:30 PM'},
+            {id: 2, from: 'them', text: 'ઠીક છે, ખાસ ધ્યાન રાખજો', time: 'સોમવાર 2:35 PM'}
+        ]
+    },
+    archived: [],
+    currentUser: {name: "દેવેન્દ્રભાઈ | Vidushi Bot v3.0"}
+};
+
+let activeChatId = null;
+let messageIdCounter = 100;
+
+// ચેટ લિસ્ટ રેન્ડર કરવી
+function renderChatList() {
     const list = document.getElementById('chatList');
+    
+    if (state.contacts.length === 0) {
+        list.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-comments"></i>
+                <h3>કોઈ ચેટ્સ નથી</h3>
+                <p>નવો સંપર્ક ઉમેરવા માટે નીચેના + બટન પર ક્લિક કરો</p>
+            </div>
+        `;
+        return;
+    }
+    
     list.innerHTML = '';
-    state.contacts.forEach(c => {
+    
+    state.contacts.forEach(contact => {
         const row = document.createElement('div');
         row.className = 'chat-row';
-        row.onclick = () => openChat(c);
-        row.innerHTML = `<div class="avatar">${c.name[0]}</div>
-                        <div style="flex:1; min-width:0;">
-                            <div style="display:flex; justify-content:space-between;">
-                                <b style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${c.name}</b>
-                                <span style="font-size:10px; color:#888;">${c.lastTime || ''}</span>
-                            </div>
-                            <small style="color:#666; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; display:block;">${c.lastMsg}</small>
-                        </div>`;
+        if (activeChatId === contact.id) row.classList.add('active');
+        
+        row.onclick = () => openChat(contact.id);
+        
+        // સ્ટેટસ ડિસ્પ્લે
+        let statusDisplay = '';
+        if (contact.status === 'online') {
+            statusDisplay = '<div class="online-status"><div class="online-dot"></div> ઓનલાઇન</div>';
+        } else if (contact.status === 'lastSeen') {
+            statusDisplay = `<div class="online-status" style="color:#888;">છેલ્લો જોયેલ ${contact.lastTime}</div>`;
+        } else {
+            statusDisplay = '<div class="online-status" style="color:#888;">ઑફલાઇન</div>';
+        }
+        
+        row.innerHTML = `
+            <div class="avatar">${contact.name[0]}</div>
+            <div class="chat-info">
+                <div class="chat-header-row">
+                    <div class="chat-name">${contact.name}</div>
+                    <div class="chat-time">${contact.lastTime}</div>
+                </div>
+                <div class="chat-preview">
+                    ${contact.lastMsg}
+                </div>
+                ${statusDisplay}
+            </div>
+            ${contact.unread > 0 ? `<div class="unread-badge">${contact.unread}</div>` : ''}
+        `;
+        
         list.appendChild(row);
     });
 }
 
-function openChat(c) {
-    activeId = c.id;
-    document.getElementById('chatName').innerText = c.name;
-    document.getElementById('chatNum').innerText = c.phone;
-    document.getElementById('chatAvatar').innerText = c.name[0];
-    if(window.innerWidth <= 900) {
-        document.getElementById('chatPanel').style.display = 'flex';
+// ચેટ ખોલવી
+function openChat(chatId) {
+    activeChatId = chatId;
+    
+    const contact = state.contacts.find(c => c.id === chatId);
+    if (!contact) return;
+    
+    // આપોઆપ સ્ટેટસ જનરેટ કરો
+    let statusText = '';
+    if (contact.status === 'online') {
+        statusText = 'ઓનલાઇન';
+    } else if (contact.status === 'lastSeen') {
+        statusText = `છેલ્લો જોયેલ ${contact.lastTime}`;
+    } else {
+        statusText = 'ઑફલાઇન';
+    }
+    
+    // હેડર અપડેટ કરો
+    document.getElementById('chatName').innerText = contact.name;
+    document.getElementById('chatNum').innerText = contact.phone;
+    document.getElementById('chatStatus').innerHTML = `
+        <span id="chatNum">${statusText}</span>
+    `;
+    document.getElementById('chatAvatar').innerText = contact.name[0];
+    
+    // યુનરીડ મેસેજ રીસેટ કરો
+    contact.unread = 0;
+    
+    // મોબાઈલ ડિસ્પ્લે માટે
+    if (window.innerWidth <= 900) {
+        document.getElementById('sidebar').classList.add('hidden');
+        document.getElementById('chatPanel').classList.add('active');
         document.getElementById('backBtn').style.display = 'block';
     }
-    renderMsgs();
+    
+    // મેસેજ ઇનપુટ દેખાડો
+    document.getElementById('messageInputContainer').style.display = 'flex';
+    document.getElementById('msgInput').focus();
+    
+    // વેલકમ સ્ક્રીન છુપાવો
+    document.getElementById('welcomeScreen').style.display = 'none';
+    
+    // મેસેજ રેન્ડર કરો
+    renderMessages();
+    
+    // ચેટ લિસ્ટ અપડેટ કરો
+    renderChatList();
+    
+    // સ્ટેટ સેવ કરો
+    saveState();
 }
 
-function renderMsgs() {
+// મેસેજ રેન્ડર કરવા
+function renderMessages() {
     const body = document.getElementById('chatBody');
+    
+    // વેલકમ સ્ક્રીન છુપાવો
+    const welcomeScreen = document.getElementById('welcomeScreen');
+    if (welcomeScreen) {
+        welcomeScreen.style.display = 'none';
+    }
+    
+    if (!activeChatId || !state.chats[activeChatId] || state.chats[activeChatId].length === 0) {
+        body.innerHTML = `
+            <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:20px;">
+                <div class="avatar" style="width:80px; height:80px; margin-bottom:15px; font-size:30px;">
+                    ${state.contacts.find(c => c.id === activeChatId)?.name[0] || '?'}
+                </div>
+                <h3 style="color:#075E54; margin-bottom:10px;">
+                    ${state.contacts.find(c => c.id === activeChatId)?.name || 'અજાણ્યા'}
+                </h3>
+                <p style="color:#666; max-width:300px;">
+                    તમે અને ${state.contacts.find(c => c.id === activeChatId)?.name || 'અજાણ્યા'} વચ્ચે હજી કોઈ મેસેજ નથી. હેલો મેસેજ મોકલીને ચેટ શરૂ કરો!
+                </p>
+            </div>
+        `;
+        return;
+    }
+    
     body.innerHTML = '';
-    (state.chats[activeId] || []).forEach(m => {
-        const b = document.createElement('div');
-        b.className = `bubble ${m.from}`;
-        const tick = m.from === 'me' ? ' <span style="color:#34b7f1">✓✓</span>' : '';
-        b.innerHTML = `<div>${m.text}</div><div class="m-time">${m.time}${tick}</div>`;
-        body.appendChild(b);
+    
+    const messages = state.chats[activeChatId];
+    
+    messages.forEach(msg => {
+        const bubble = document.createElement('div');
+        bubble.className = `bubble ${msg.from}`;
+        
+        const timeWithStatus = msg.from === 'me' ? 
+            `${msg.time} <span class="message-status">✓✓</span>` : 
+            msg.time;
+        
+        bubble.innerHTML = `
+            <div>${msg.text}</div>
+            <div class="m-time">${timeWithStatus}</div>
+        `;
+        
+        body.appendChild(bubble);
     });
+    
+    // સ્ક્રોલ નીચે કરો
     body.scrollTop = body.scrollHeight;
 }
 
+// મેસેજ મોકલવો
 function sendMsg() {
-    const input = document.getElementById('mInput');
+    const input = document.getElementById('msgInput');
     const text = input.value.trim();
-    if(!text || !activeId) return;
     
+    if (!text || !activeChatId) return;
+    
+    // મેસેજ ID જનરેટ કરો
+    messageIdCounter++;
+    
+    // મારો મેસેજ ઉમેરો
     const time = getCurrentTime();
-    state.chats[activeId].push({from:'me', text:text, time: time});
+    state.chats[activeChatId].push({
+        id: messageIdCounter,
+        from: 'me',
+        text: text,
+        time: time
+    });
     
-    const contact = state.contacts.find(c => c.id === activeId);
-    contact.lastMsg = text;
-    contact.lastTime = time;
+    // કોન્ટેક્ટની લાસ્ટ મેસેજ અપડેટ કરો
+    const contact = state.contacts.find(c => c.id === activeChatId);
+    if (contact) {
+        contact.lastMsg = text;
+        contact.lastTime = time;
+    }
     
+    // ઇનપુટ ક્લિયર કરો
     input.value = '';
-    save(); renderMsgs(); renderList();
-}
-
-function addContact() {
-    const n = document.getElementById('newName').value.trim();
-    const p = document.getElementById('newPhone').value.trim();
-    if(!n || !p) { alert('નામ અને નંબર લખો'); return; }
     
+    // મેસેજ રેન્ડર કરો
+    renderMessages();
+    
+    // ચેટ લિસ્ટ અપડેટ કરો
+    renderChatList();
+    
+    // સ્ટેટ સેવ કરો
+    saveState();
+    
+    // આપોઆપ જવાબ (થોડી ડિલે સાથે)
+    setTimeout(() => {
+        sendAutoReply(text);
+    }, 1000 + Math.random() * 2000);
+}
+
+// આપોઆપ જવાબ મોકલવો
+function sendAutoReply(userMessage) {
+    if (!activeChatId) return;
+    
+    const reply = getAutoReply(userMessage);
+    messageIdCounter++;
+    
+    // બોટનો મેસેજ ઉમેરો
+    const time = getCurrentTime();
+    state.chats[activeChatId].push({
+        id: messageIdCounter,
+        from: 'them',
+        text: reply,
+        time: time
+    });
+    
+    // કોન્ટેક્ટની લાસ્ટ મેસેજ અપડેટ કરો
+    const contact = state.contacts.find(c => c.id === activeChatId);
+    if (contact) {
+        contact.lastMsg = reply;
+        contact.lastTime = time;
+        contact.unread = (contact.unread || 0) + 1;
+    }
+    
+    // મેસેજ રેન્ડર કરો
+    renderMessages();
+    
+    // ચેટ લિસ્ટ અપડેટ કરો
+    renderChatList();
+    
+    // સ્ટેટ સેવ કરો
+    saveState();
+}
+
+// નવો સંપર્ક ઉમેરવો
+function addContact() {
+    const name = document.getElementById('newName').value.trim();
+    const phone = document.getElementById('newPhone').value.trim();
+    const status = document.getElementById('newStatus').value;
+    
+    if (!name || !phone) {
+        alert('કૃપા કરીને નામ અને ફોન નંબર ભરો');
+        return;
+    }
+    
+    // નવો ID જનરેટ કરો
     const id = Date.now();
-    state.contacts.push({id, name:n, phone:p, lastMsg:'', lastTime: ''});
+    
+    // સંપર્ક ઉમેરો
+    state.contacts.push({
+        id: id,
+        name: name,
+        phone: phone,
+        lastMsg: 'હેલો!',
+        lastTime: getCurrentTime(),
+        status: status,
+        unread: 0
+    });
+    
+    // ખાલી ચેટ એરે બનાવો
     state.chats[id] = [];
-    save(); renderList();
-    document.getElementById('addModal').style.display = 'none';
+    
+    // મોડલ બંધ કરો
+    closeModal('addModal');
+    
+    // ફોર્મ ક્લિયર કરો
+    document.getElementById('newName').value = '';
+    document.getElementById('newPhone').value = '';
+    
+    // ચેટ લિસ્ટ અપડેટ કરો
+    renderChatList();
+    
+    // સ્ટેટ સેવ કરો
+    saveState();
+    
+    // નવો ચેટ ખોલો
+    openChat(id);
 }
 
-function toggleDropdown() {
-    const d = document.getElementById("dropdownMenu");
-    d.style.display = (d.style.display === "block") ? "none" : "block";
+// ચેટ બંધ કરવી (મોબાઈલ માટે)
+function closeChat() {
+    activeChatId = null;
+    
+    document.getElementById('sidebar').classList.remove('hidden');
+    document.getElementById('chatPanel').classList.remove('active');
+    document.getElementById('backBtn').style.display = 'none';
+    
+    // મેસેજ ઇનપુટ છુપાવો
+    document.getElementById('messageInputContainer').style.display = 'none';
+    
+    // વેલકમ સ્ક્રીન દેખાડો
+    document.getElementById('welcomeScreen').style.display = 'flex';
+    
+    // ચેટ લિસ્ટ અપડેટ કરો
+    renderChatList();
 }
 
-window.onclick = function(e) {
-    if (!e.target.matches('.header span')) {
-        document.getElementById("dropdownMenu").style.display = "none";
+// સર્ચ ફિલ્ટર
+function filterChats() {
+    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+    const rows = document.querySelectorAll('.chat-row');
+    
+    rows.forEach(row => {
+        const name = row.querySelector('.chat-name').textContent.toLowerCase();
+        const preview = row.querySelector('.chat-preview').textContent.toLowerCase();
+        
+        if (name.includes(searchTerm) || preview.includes(searchTerm)) {
+            row.style.display = 'flex';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+}
+
+// સર્ચ ટૉગલ
+function toggleSearch() {
+    const searchContainer = document.getElementById('searchContainer');
+    if (searchContainer.style.display === 'none' || searchContainer.style.display === '') {
+        searchContainer.style.display = 'block';
+        document.getElementById('searchInput').focus();
+    } else {
+        searchContainer.style.display = 'none';
+        document.getElementById('searchInput').value = '';
+        filterChats(); // રીસેટ કરો
     }
 }
 
-function save() { localStorage.setItem('wa_final_dynamic', JSON.stringify(state)); }
-function closeChat() { document.getElementById('chatPanel').style.display = 'none'; }
-window.onload = renderList;
+// ડ્રોપડાઉન ટૉગલ
+function toggleDropdown() {
+    const dropdown = document.getElementById("dropdownMenu");
+    dropdown.style.display = (dropdown.style.display === "block") ? "none" : "block";
+}
+
+// મોડલ બંધ કરવું
+function closeModal(modalId) {
+    document.getElementById(modalId).style.display = 'none';
+}
+
+// પ્રોફાઇલ દેખાડવી
+function showProfile() {
+    toggleDropdown();
+    document.getElementById('profileModal').style.display = 'flex';
+}
+
+// નવો સંપર્ક મોડલ દેખાડવું
+function showAddContactModal() {
+    document.getElementById('addModal').style.display = 'flex';
+    document.getElementById('newName').focus();
+}
+
+// આર્કાઇવ્ડ ચેટ્સ દેખાડવી
+function showArchived() {
+    toggleDropdown();
+    alert('તમારી પાસે કોઈ આર્કાઇવ્ડ ચેટ્સ નથી');
+}
+
+// ડેટા ક્લિયર કરવો
+function clearData() {
+    toggleDropdown();
+    if (confirm('શું તમે બધો ડેટા ક્લિયર કરવા માંગો છો? આ ક્રિયા પૂર્વવત્ થઈ શકશે નહીં.')) {
+        localStorage.clear();
+        location.reload();
+    }
+}
+
+// નેવિગેશન ફંક્શન્સ
+function showChats() {
+    // Already on chats page
+    document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+    document.querySelectorAll('.nav-item')[0].classList.add('active');
+}
+
+function showUpdates() {
+    document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+    document.querySelectorAll('.nav-item')[1].classList.add('active');
+    alert('નવા અપડેટ્સ:\n\n• વોઇસ મેસેજિંગ\n• વીડિઓ કૉલ્સ\n• ગ્રૂપ ચેટ્સ\n\nટૂંક સમયમાં આવશે!');
+}
+
+function showCommunities() {
+    document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+    document.querySelectorAll('.nav-item')[2].classList.add('active');
+    alert('કોમ્યુનિટી ફીચર ટૂંક સમયમાં આવશે');
+}
+
+function showSettings() {
+    document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+    document.querySelectorAll('.nav-item')[3].classList.add('active');
+    alert('સેટિંગ્સ પૃષ્ઠ ટૂંક સમયમાં આવશે\n\nવર્ઝન: WhatsApp Pro v3.0\nડેવલપર: દેવેન્દ્રભાઈ');
+}
+
+// કી પ્રેસ હેન્ડલર (Enter કી માટે)
+function handleKeyPress(event) {
+    if (event.key === 'Enter') {
+        sendMsg();
+    }
+}
+
+// સ્ટેટ સેવ કરવી
+function saveState() {
+    localStorage.setItem('wa_pro_state', JSON.stringify(state));
+}
+
+// વિન્ડો ક્લિક ઇવેન્ટ (ડ્રોપડાઉન માટે)
+window.onclick = function(event) {
+    const dropdown = document.getElementById("dropdownMenu");
+    if (dropdown && !event.target.matches('.fa-ellipsis-v') && !event.target.matches('.header-actions i')) {
+        dropdown.style.display = "none";
+    }
+};
+
+// પેજ લોડ થાય ત્યારે
+window.onload = function() {
+    renderChatList();
+    
+    // વેલકમ મેસેજ
+    console.log('WhatsApp Pro v3.0 લોડ થયું');
+    console.log('ડેવલપર: દેવેન્દ્રભાઈ | Vidushi Bot v3.0');
+    
+    // રિસ્પોન્સિવ હેન્ડલિંગ
+    window.addEventListener('resize', function() {
+        if (window.innerWidth > 900) {
+            document.getElementById('sidebar').classList.remove('hidden');
+            document.getElementById('chatPanel').classList.remove('active');
+            document.getElementById('backBtn').style.display = 'none';
+        }
+    });
+};
+
+// સેમ્પલ ચેટ્સ ઉમેરવા માટે (જો ખાલી હોય તો)
+if (state.contacts.length === 0) {
+    state = {
+        contacts: [
+            {id: 1, name: "દેવેન્દ્રભાઈ", phone: "98765 43210", lastMsg: "જય શ્રી કૃષ્ણ", lastTime: getCurrentTime(), status: "online", unread: 0}
+        ],
+        chats: {
+            1: [
+                {id: 1, from: 'them', text: 'જય શ્રી કૃષ્ણ', time: getCurrentTime()}
+            ]
+        },
+        archived: [],
+        currentUser: {name: "દેવેન્દ્રભાઈ | Vidushi Bot v3.0"}
+    };
+    saveState();
+    renderChatList();
+}
 </script>
 </body>
 </html>
