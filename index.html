@@ -3,249 +3,174 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>What A App - Devendrabhai Edition</title>
+<title>WhatsApp - Devendrabhai</title>
 <style>
-:root{--bg:#f0f2f5;--panel:#fff;--text:#111;--muted:#667;--accent:#25D366;--accent-dark:#128C7E;--bubble-me:#d9fdd3;--bubble-them:#fff;--border:#e5e7eb;--blue:#34b7f1;}
-.dark{--bg:#0b141a;--panel:#111b21;--text:#e9edef;--muted:#aebac1;--bubble-me:#005c4b;--bubble-them:#202c33;--border:#1f2c34;}
+:root{--wa-green:#075E54;--wa-light-green:#25D366;--bg:#f0f2f5;--text:#111;--muted:#667;--white:#fff;--border:#e9edef;--teal:#128C7E;}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,sans-serif;overflow:hidden;}
+body{margin:0;background:var(--bg);color:var(--text);font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow:hidden;height:100vh;}
 
-/* Splash */
-#splash{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#25D366;color:#fff;z-index:9999;transition:opacity .5s;}
+/* Header */
+.header{background:var(--wa-green);color:white;padding:15px 20px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 5px rgba(0,0,0,0.1);z-index:10;}
+.header h2{margin:0;font-size:20px;letter-spacing:0.5px;}
 
-/* App Layout */
-.app{display:flex;flex-direction:column;height:100vh;}
-.content{display:grid;grid-template-columns:360px 1fr;height:100%;min-height:0;}
-@media(max-width:900px){.content{grid-template-columns:1fr;} #chatPanel{display:none;position:fixed;inset:0;z-index:100;background:var(--bg);}}
+/* Main App Layout */
+.app-container{display:grid;grid-template-columns:380px 1fr;height:calc(100vh - 55px);background:var(--white);}
+@media(max-width:900px){.app-container{grid-template-columns:1fr;} #chatPanel{display:none;position:fixed;inset:0;z-index:100;}}
 
-/* Side Panel */
-.panel{background:var(--panel);border-right:1px solid var(--border);display:flex;flex-direction:column;}
-.topbar{display:flex;align-items:center;gap:12px;padding:12px;border-bottom:1px solid var(--border);background:var(--panel);flex-shrink:0;}
-.avatar{width:42px;height:42px;border-radius:50%;object-fit:cover;background:var(--accent-dark);display:grid;place-items:center;color:white;font-weight:bold;flex-shrink:0;}
+/* Sidebar */
+.sidebar{border-right:1px solid var(--border);display:flex;flex-direction:column;background:var(--white);position:relative;}
+.search-bar{padding:10px;background:#fff;border-bottom:1px solid #f2f2f2;}
+.search-bar input{width:100%;padding:8px 15px;border-radius:20px;border:none;background:#f0f2f5;outline:none;font-size:14px;}
 
-/* List Area */
-.list-container{flex:1;overflow-y:auto;}
-.row{display:flex;align-items:center;padding:12px;border-bottom:1px solid var(--border);cursor:pointer;transition: 0.2s;}
-.row:hover{background:rgba(0,0,0,0.05);}
+/* Chat List */
+.chat-list{flex:1;overflow-y:auto;}
+.chat-row{display:flex;align-items:center;padding:12px 15px;cursor:pointer;border-bottom:1px solid #f6f6f6;transition:0.2s;}
+.chat-row:hover{background:#f5f5f5;}
+.chat-row .avatar{width:50px;height:50px;border-radius:50%;background:#dfe5e7;margin-right:15px;display:grid;place-items:center;font-weight:bold;color:white;object-fit:cover;}
+.chat-info{flex:1;min-width:0;}
+.chat-info b{display:block;font-size:16px;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.chat-info small{color:var(--muted);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;}
 
-/* Chat UI */
-.messages{flex:1;overflow-y:auto;padding:20px;background-color:#e5ddd5;background-image:url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png');display:flex;flex-direction:column;}
-.bubble{max-width:75%;padding:8px 12px;border-radius:12px;margin:4px 0;font-size:15px;position:relative;line-height:1.4;}
-.me{align-self:flex-end;background:var(--bubble-me);border-top-right-radius:2px;}
-.them{align-self:flex-start;background:var(--bubble-them);border-top-left-radius:2px;}
-.m-meta{font-size:10px;color:var(--muted);text-align:right;margin-top:4px;display:flex;justify-content:flex-end;gap:3px;align-items:center;}
-.tick{color:var(--blue);font-weight:bold;font-size:14px;}
+/* Chat Window */
+.chat-window{display:flex;flex-direction:column;background:#e5ddd5 url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png');}
+.chat-header{padding:10px 15px;background:#ededed;display:flex;align-items:center;gap:12px;border-bottom:1px solid #ddd;}
+.chat-body{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;}
+.bubble{max-width:65%;padding:8px 12px;border-radius:8px;margin-bottom:8px;font-size:14.5px;box-shadow:0 1px 1px rgba(0,0,0,0.1);line-height:1.4;}
+.me{align-self:flex-end;background:#dcf8c6;border-top-right-radius:0;}
+.them{align-self:flex-start;background:#fff;border-top-left-radius:0;}
 
-/* Input Area */
-.composer{padding:10px;background:var(--panel);display:flex;align-items:center;gap:10px;border-top:1px solid var(--border);}
-.composer input{flex:1;padding:12px;border-radius:25px;border:none;background:var(--bg);color:var(--text);outline:none;}
-.icon-btn{font-size:20px;cursor:pointer;color:var(--muted);padding:5px;}
+/* Footer Menu */
+.footer-nav{display:flex;background:#fff;border-top:1px solid #ddd;padding:10px 0;}
+.nav-item{flex:1;text-align:center;color:var(--muted);font-size:12px;cursor:pointer;border:none;background:none;}
+.nav-item.active{color:var(--wa-green);font-weight:bold;}
 
-/* Footer & Credit */
-.footer{display:flex;background:var(--panel);border-top:1px solid var(--border);padding:8px 0;flex-shrink:0;}
-.tab-btn{flex:1;text-align:center;background:none;border:none;color:var(--muted);font-size:11px;cursor:pointer;}
-.tab-btn.active{color:var(--accent-dark);font-weight:bold;}
-.credit-bar{font-size:10px;text-align:center;padding:4px;background:var(--border);color:var(--muted);font-weight:bold;}
+/* FAB */
+.fab{position:absolute;bottom:80px;right:20px;width:55px;height:55px;border-radius:50%;background:var(--wa-light-green);color:white;display:grid;place-items:center;box-shadow:0 3px 6px rgba(0,0,0,0.3);cursor:pointer;font-size:24px;z-index:5;}
 
-/* Modal */
-.modal{position:fixed;inset:0;background:rgba(0,0,0,0.5);display:none;align-items:center;justify-content:center;z-index:200;}
-.modal-content{background:var(--panel);padding:20px;border-radius:15px;width:90%;max-width:350px;}
+.credit-text{font-size:11px;text-align:center;padding:5px;background:#f0f0f0;color:#888;border-top:1px solid #ddd;}
 </style>
 </head>
 <body>
 
-<div id="splash">
-    <div style="font-size:50px;margin-bottom:10px;">💬</div>
-    <h2 style="margin:0">What A App</h2>
-    <p>Created by Devendrabhai 🙏</p>
-</div>
+<header class="header">
+    <h2>WhatsApp</h2>
+    <div style="font-size:18px;">🔍 &nbsp; ⋮</div>
+</header>
 
-<div class="app">
-  <div class="content">
-    <section class="panel">
-      <div class="topbar">
-        <div class="avatar">D</div>
-        <b id="pTitle">What A App</b>
-        <div style="flex:1"></div>
-        <span class="icon-btn" onclick="openModal()">➕</span>
-      </div>
-      
-      <div class="list-container" id="mainList"></div>
+<div class="app-container">
+    <section class="sidebar">
+        <div class="search-bar"><input type="text" placeholder="સર્ચ કરો અથવા નવી ચેટ શરૂ કરો"></div>
+        
+        <div class="chat-list" id="chatList"></div>
 
-      <div class="credit-bar">© Devendrabhai | Vidushi Bot v2.0</div>
-      
-      <nav class="footer">
-        <button class="tab-btn active" onclick="switchTab('chat')">💬<br>ચેટ</button>
-        <button class="tab-btn" onclick="switchTab('update')">🔔<br>અપડેટ</button>
-        <button class="tab-btn" onclick="switchTab('comm')">👥<br>કોમ્યુનિટી</button>
-        <button class="tab-btn" onclick="switchTab('set')">⚙️<br>સેટિંગ્સ</button>
-      </nav>
+        <div class="fab" onclick="document.getElementById('addModal').style.display='flex'">+</div>
+
+        <div class="credit-text">Created by Devendrabhai | Vidushi Bot</div>
+        <nav class="footer-nav">
+            <button class="nav-item active">💬<br>ચેટ</button>
+            <button class="nav-item">🔔<br>અપડેટ</button>
+            <button class="nav-item">👥<br>કોમ્યુનિટી</button>
+            <button class="nav-item">📞<br>કૉલ્સ</button>
+        </nav>
     </section>
 
-    <section class="panel" id="chatPanel">
-      <div class="topbar">
-        <button class="icon-btn" onclick="closeChat()" id="backBtn">⬅️</button>
-        <div id="activeProfile">
-            <img id="chatImg" class="avatar" src="" style="display:none">
-            <div id="chatInitial" class="avatar">?</div>
+    <section class="chat-window" id="chatPanel">
+        <div class="chat-header">
+            <button onclick="document.getElementById('chatPanel').style.display='none'" id="backBtn" style="border:none;background:none;font-size:20px;display:none;">←</button>
+            <div id="chatAvatar" class="avatar" style="width:40px;height:40px;border-radius:50%;background:#ccc;display:grid;place-items:center;color:white;font-weight:bold;">?</div>
+            <div style="flex:1">
+                <b id="chatName">ચેટ પસંદ કરો</b><br>
+                <small id="onlineStatus" style="color:var(--wa-green);display:none;">ઓનલાઇન</small>
+            </div>
+            <div style="font-size:18px;color:#555;">📞 &nbsp; 📹 &nbsp; ⋮</div>
         </div>
-        <div style="margin-left:5px">
-          <b id="activeName">ચેટ પસંદ કરો</b><br>
-          <small id="lastSeen" style="color:var(--accent-dark);font-size:11px;display:none;">Online</small>
+        
+        <div class="chat-body" id="chatBody"></div>
+
+        <div style="padding:10px;background:#f0f0f0;display:flex;align-items:center;gap:10px;">
+            <span style="font-size:20px;">😊</span>
+            <input type="text" id="msgInput" placeholder="મેસેજ ટાઈપ કરો" style="flex:1;padding:10px;border-radius:20px;border:none;outline:none;">
+            <button onclick="sendMsg()" style="background:var(--wa-green);color:white;border:none;width:40px;height:40px;border-radius:50%;font-size:18px;cursor:pointer;">➤</button>
         </div>
-      </div>
-
-      <div class="messages" id="msgBox"></div>
-
-      <div class="composer">
-        <span class="icon-btn">😊</span>
-        <span class="icon-btn">📎</span>
-        <input type="text" id="mInput" placeholder="મેસેજ લખો...">
-        <span class="icon-btn">📷</span>
-        <button onclick="sendMsg()" style="border:none;background:none;color:var(--accent-dark);font-weight:bold;cursor:pointer;padding:10px;">મોકલો</button>
-      </div>
     </section>
-  </div>
 </div>
 
-<div class="modal" id="addModal">
-  <div class="modal-content">
-    <h3>નવો સંપર્ક ઉમેરો</h3>
-    <input type="text" id="nName" placeholder="નામ લખો" style="width:100%;padding:10px;margin-bottom:12px;border:1px solid var(--border);border-radius:8px;">
-    <p style="font-size:12px;margin:0 0 5px 0;">પ્રોફાઈલ ફોટો પસંદ કરો:</p>
-    <input type="file" id="nImg" accept="image/*" style="margin-bottom:15px;width:100%;">
-    <button onclick="saveContact()" style="width:100%;padding:12px;background:var(--accent-dark);color:white;border:none;border-radius:8px;font-weight:bold;cursor:pointer;">સેવ કરો</button>
-    <button onclick="closeModal()" style="width:100%;padding:10px;background:none;border:none;color:red;margin-top:5px;cursor:pointer;">રદ કરો</button>
-  </div>
+<div id="addModal" style="position:fixed;inset:0;background:rgba(0,0,0,0.5);display:none;align-items:center;justify-content:center;z-index:200;">
+    <div style="background:white;padding:25px;border-radius:10px;width:320px;">
+        <h3 style="margin-top:0">નવો સંપર્ક</h3>
+        <input type="text" id="newName" placeholder="નામ લખો" style="width:100%;padding:10px;margin-bottom:15px;border:1px solid #ddd;border-radius:5px;">
+        <button onclick="addContact()" style="width:100%;padding:10px;background:var(--wa-green);color:white;border:none;border-radius:5px;font-weight:bold;cursor:pointer;">સેવ કરો</button>
+        <button onclick="document.getElementById('addModal').style.display='none'" style="width:100%;padding:10px;background:none;border:none;color:red;margin-top:5px;cursor:pointer;">રદ કરો</button>
+    </div>
 </div>
 
 <script>
-// Data State
-let state = JSON.parse(localStorage.getItem('wa_final_edition')) || {
-  contacts: [{id:1, name:"મિત્ર", img:null, lastMsg:"જય શ્રી કૃષ્ણ"}],
-  chats: {1:[]},
-  theme: 'light'
+let state = JSON.parse(localStorage.getItem('wa_premium_v1')) || {
+    contacts: [{id:1, name:"દેવેન્દ્રભાઈ", lastMsg:"જય શ્રી કૃષ્ણ!"}],
+    chats: {1:[]}
 };
-let curId = null;
+let activeId = null;
 
-// Render Functions
 function renderList() {
-  const list = document.getElementById('mainList');
-  list.innerHTML = '';
-  state.contacts.forEach(c => {
-    const d = document.createElement('div');
-    d.className = 'row';
-    d.onclick = () => openChat(c);
-    const imgHtml = c.img ? `<img src="${c.img}" class="avatar">` : `<div class="avatar">${c.name[0]}</div>`;
-    d.innerHTML = `
-        ${imgHtml}
-        <div style="margin-left:12px;flex:1;min-width:0;">
-            <div style="display:flex;justify-content:space-between;align-items:center;">
-                <b style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${c.name}</b>
-                <span style="font-size:10px;color:var(--muted)">10:30 AM</span>
-            </div>
-            <small style="color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block;">${c.lastMsg}</small>
-        </div>`;
-    list.appendChild(d);
-  });
+    const list = document.getElementById('chatList');
+    list.innerHTML = '';
+    state.contacts.forEach(c => {
+        const row = document.createElement('div');
+        row.className = 'chat-row';
+        row.onclick = () => openChat(c);
+        row.innerHTML = `<div class="avatar" style="background:#128C7E">${c.name[0]}</div>
+                        <div class="chat-info"><b>${c.name}</b><small>${c.lastMsg}</small></div>
+                        <div style="font-size:11px;color:#999">10:45 AM</div>`;
+        list.appendChild(row);
+    });
 }
 
 function openChat(c) {
-  curId = c.id;
-  document.getElementById('activeName').innerText = c.name;
-  document.getElementById('lastSeen').style.display = 'block';
-  
-  const imgEl = document.getElementById('chatImg');
-  const initEl = document.getElementById('chatInitial');
-  
-  if(c.img) {
-    imgEl.src = c.img;
-    imgEl.style.display = 'block';
-    initEl.style.display = 'none';
-  } else {
-    imgEl.style.display = 'none';
-    initEl.style.display = 'grid';
-    initEl.innerText = c.name[0];
-  }
-  
-  if(window.innerWidth <= 900) {
-    document.getElementById('chatPanel').style.display = 'flex';
-  }
-  renderMessages();
+    activeId = c.id;
+    document.getElementById('chatName').innerText = c.name;
+    document.getElementById('chatAvatar').innerText = c.name[0];
+    document.getElementById('onlineStatus').style.display = 'block';
+    if(window.innerWidth <= 900) {
+        document.getElementById('chatPanel').style.display = 'flex';
+        document.getElementById('backBtn').style.display = 'block';
+    }
+    renderMsgs();
 }
 
-function renderMessages() {
-  const box = document.getElementById('msgBox');
-  box.innerHTML = '';
-  const time = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-  
-  (state.chats[curId] || []).forEach(m => {
-    const b = document.createElement('div');
-    b.className = `bubble ${m.from}`;
-    // ✓✓ Blue Tick Logic
-    const tick = m.from === 'me' ? '<span class="tick">✓✓</span>' : '';
-    b.innerHTML = `<div>${m.text}</div><div class="m-meta">${time} ${tick}</div>`;
-    box.appendChild(b);
-  });
-  box.scrollTop = box.scrollHeight;
+function renderMsgs() {
+    const body = document.getElementById('chatBody');
+    body.innerHTML = '';
+    (state.chats[activeId] || []).forEach(m => {
+        const b = document.createElement('div');
+        b.className = `bubble ${m.from}`;
+        b.innerHTML = `${m.text} <div style="font-size:10px;text-align:right;margin-top:4px;color:#888;">10:46 AM ${m.from==='me'?'<span style="color:#34b7f1">✓✓</span>':''}</div>`;
+        body.appendChild(b);
+    });
+    body.scrollTop = body.scrollHeight;
 }
 
 function sendMsg() {
-  const i = document.getElementById('mInput');
-  if(!i.value || !curId) return;
-  if(!state.chats[curId]) state.chats[curId] = [];
-  
-  state.chats[curId].push({from:'me', text:i.value});
-  state.contacts.find(c => c.id === curId).lastMsg = i.value;
-  
-  const val = i.value;
-  i.value = '';
-  saveState(); renderMessages(); renderList();
+    const input = document.getElementById('msgInput');
+    if(!input.value || !activeId) return;
+    state.chats[activeId].push({from:'me', text:input.value});
+    state.contacts.find(c => c.id === activeId).lastMsg = input.value;
+    const v = input.value; input.value = '';
+    save(); renderMsgs(); renderList();
 }
 
-// Modal & UI Helper
-function saveContact() {
-  const name = document.getElementById('nName').value;
-  const file = document.getElementById('nImg').files[0];
-  if(!name) return;
-
-  if(file) {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-        finalizeContact(name, e.target.result);
-    };
-    reader.readAsDataURL(file);
-  } else {
-    finalizeContact(name, null);
-  }
-}
-
-function finalizeContact(name, imgData) {
+function addContact() {
+    const n = document.getElementById('newName').value;
+    if(!n) return;
     const id = Date.now();
-    state.contacts.push({id, name, img: imgData, lastMsg: ''});
+    state.contacts.push({id, name:n, lastMsg:''});
     state.chats[id] = [];
-    saveState(); renderList(); closeModal();
+    save(); renderList();
+    document.getElementById('addModal').style.display = 'none';
 }
 
-function saveState() { localStorage.setItem('wa_final_edition', JSON.stringify(state)); }
-function openModal() { document.getElementById('addModal').style.display = 'flex'; }
-function closeModal() { document.getElementById('addModal').style.display = 'none'; document.getElementById('nName').value=''; }
-function closeChat() { document.getElementById('chatPanel').style.display = 'none'; }
-function switchTab(t) { 
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    event.currentTarget.classList.add('active');
-    document.getElementById('pTitle').innerText = t === 'chat' ? 'What A App' : t.toUpperCase(); 
-}
+function save() { localStorage.setItem('wa_premium_v1', JSON.stringify(state)); }
 
-// Startup
-window.onload = () => {
-  renderList();
-  setTimeout(() => {
-      const sp = document.getElementById('splash');
-      sp.style.opacity = '0';
-      setTimeout(() => sp.remove(), 500);
-  }, 1200);
-};
+window.onload = renderList;
 </script>
 </body>
 </html>
