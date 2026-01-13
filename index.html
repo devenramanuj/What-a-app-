@@ -3,8 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-    <title>WhatsApp Pro - Real Time</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <title>WhatsApp Pro</title>
     <style>
         :root {
             --wa-teal: #075E54;
@@ -13,10 +12,8 @@
             --white: #ffffff;
             --text: #111;
             --muted: #667;
-            --shadow: 0 2px 5px rgba(0,0,0,0.1);
             --bubble-me: #dcf8c6;
             --bubble-them: #ffffff;
-            --online: #34B7F1;
         }
 
         * {
@@ -26,58 +23,35 @@
         }
 
         body {
-            font-family: 'Segoe UI', 'Noto Sans Gujarati', sans-serif;
+            font-family: 'Segoe UI', sans-serif;
             background: #f0f2f5;
             height: 100vh;
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            color: var(--text);
         }
 
         /* Header */
         .header {
-            background: linear-gradient(to right, var(--wa-teal), #128C7E);
+            background: var(--wa-teal);
             color: white;
             padding: 15px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            flex-shrink: 0;
             z-index: 100;
-            box-shadow: var(--shadow);
         }
 
         .header h2 {
-            font-size: 22px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .header-actions {
-            display: flex;
-            gap: 20px;
-            align-items: center;
-        }
-
-        .header-actions i {
-            cursor: pointer;
             font-size: 20px;
-            transition: transform 0.2s;
+            font-weight: 600;
         }
 
-        .header-actions i:hover {
-            transform: scale(1.1);
-        }
-
-        /* Main App Area */
+        /* Main App */
         .app-content {
             display: flex;
             flex: 1;
             overflow: hidden;
-            position: relative;
         }
 
         .sidebar {
@@ -86,69 +60,25 @@
             border-right: 1px solid #ddd;
             display: flex;
             flex-direction: column;
-            transition: transform 0.3s ease;
-            z-index: 1;
         }
 
         .chat-window {
             flex: 1;
             display: flex;
             flex-direction: column;
-            background: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png');
-            background-color: var(--bg);
-            background-size: contain;
+            background: var(--bg);
         }
 
         @media (max-width: 900px) {
             .sidebar {
                 width: 100%;
             }
-            
             .chat-window {
                 display: none;
                 position: fixed;
                 inset: 0;
                 z-index: 200;
             }
-            
-            .chat-window.active {
-                display: flex;
-            }
-            
-            .sidebar.hidden {
-                transform: translateX(-100%);
-            }
-        }
-
-        /* Search */
-        .search-container {
-            padding: 15px;
-            background: white;
-            border-bottom: 1px solid #eee;
-            position: relative;
-        }
-
-        .search-box {
-            width: 100%;
-            padding: 12px 45px 12px 20px;
-            border-radius: 25px;
-            border: none;
-            background: #f0f2f5;
-            font-size: 15px;
-            outline: none;
-            transition: background 0.3s;
-        }
-
-        .search-box:focus {
-            background: #e8e8e8;
-        }
-
-        .search-icon {
-            position: absolute;
-            right: 30px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #888;
         }
 
         /* Contact List */
@@ -164,113 +94,23 @@
             padding: 12px 15px;
             border-bottom: 1px solid #f6f6f6;
             cursor: pointer;
-            transition: background 0.2s;
-            position: relative;
         }
 
         .chat-row:hover {
             background: #f5f5f5;
         }
 
-        .chat-row.active {
-            background: #e8f5e8;
-        }
-
-        .chat-row.unread::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            width: 4px;
-            background: var(--wa-green);
-        }
-
         .avatar {
             width: 50px;
             height: 50px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #128c7e, #075E54);
+            background: #128c7e;
             color: white;
             display: grid;
             place-items: center;
             font-weight: bold;
             margin-right: 15px;
             flex-shrink: 0;
-            font-size: 18px;
-        }
-
-        .chat-info {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .chat-header-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 4px;
-        }
-
-        .chat-name {
-            font-weight: 600;
-            font-size: 16px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .chat-time {
-            font-size: 12px;
-            color: #888;
-        }
-
-        .chat-preview {
-            color: #666;
-            font-size: 14px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .unread-badge {
-            background: var(--wa-green);
-            color: white;
-            border-radius: 50%;
-            width: 22px;
-            height: 22px;
-            font-size: 12px;
-            display: grid;
-            place-items: center;
-            margin-left: auto;
-            margin-right: 10px;
-            font-weight: bold;
-        }
-
-        .status-indicator {
-            display: flex;
-            align-items: center;
-            font-size: 12px;
-            color: #666;
-            margin-top: 2px;
-        }
-
-        .online-dot {
-            width: 8px;
-            height: 8px;
-            background: var(--online);
-            border-radius: 50%;
-            margin-right: 5px;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.5; }
-            100% { opacity: 1; }
         }
 
         /* Chat Window */
@@ -280,42 +120,7 @@
             display: flex;
             align-items: center;
             border-bottom: 1px solid #ddd;
-            min-height: 60px;
-        }
-
-        .back-btn {
-            border: none;
-            background: none;
-            font-size: 20px;
-            margin-right: 10px;
-            display: none;
-            cursor: pointer;
-            color: var(--wa-teal);
-            padding: 5px;
-        }
-
-        .header-info {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .chat-actions {
-            display: flex;
-            gap: 15px;
-            align-items: center;
-        }
-
-        .chat-actions i {
-            color: var(--wa-teal);
-            cursor: pointer;
-            font-size: 20px;
-            padding: 5px;
-            border-radius: 50%;
-            transition: background 0.2s;
-        }
-
-        .chat-actions i:hover {
-            background: rgba(0,0,0,0.1);
+            height: 60px;
         }
 
         .chat-body {
@@ -324,110 +129,38 @@
             padding: 20px;
             display: flex;
             flex-direction: column;
-            gap: 8px;
         }
 
         /* Messages */
         .bubble {
             max-width: 75%;
-            padding: 10px 15px;
-            border-radius: 18px;
-            margin-bottom: 5px;
-            font-size: 15px;
+            padding: 8px 12px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            font-size: 14.5px;
             position: relative;
-            box-shadow: 0 1px 1px rgba(0,0,0,0.1);
-            line-height: 1.4;
-            word-break: break-word;
-            animation-duration: 0.3s;
-            animation-fill-mode: both;
         }
 
         .me {
             align-self: flex-end;
             background: var(--bubble-me);
-            border-bottom-right-radius: 4px;
-            animation-name: slideInRight;
+            border-top-right-radius: 2px;
         }
 
         .them {
             align-self: flex-start;
             background: var(--bubble-them);
-            border-bottom-left-radius: 4px;
-            animation-name: slideInLeft;
-        }
-
-        @keyframes slideInRight {
-            from {
-                transform: translateX(30px);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-
-        @keyframes slideInLeft {
-            from {
-                transform: translateX(-30px);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
+            border-top-left-radius: 0;
         }
 
         .m-time {
-            font-size: 11px;
-            color: #666;
+            font-size: 10px;
+            color: #888;
             text-align: right;
             margin-top: 4px;
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
-            gap: 5px;
         }
 
-        .message-status {
-            font-size: 14px;
-            color: #34b7f1;
-        }
-
-        .typing-indicator {
-            display: flex;
-            gap: 4px;
-            padding: 10px 15px;
-            background: white;
-            border-radius: 18px;
-            align-self: flex-start;
-            width: fit-content;
-            margin-bottom: 10px;
-            animation: fadeIn 0.5s;
-        }
-
-        .typing-dot {
-            width: 8px;
-            height: 8px;
-            background: #999;
-            border-radius: 50%;
-            animation: typing 1.4s infinite;
-        }
-
-        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
-        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
-
-        @keyframes typing {
-            0%, 60%, 100% { transform: translateY(0); }
-            30% { transform: translateY(-5px); }
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        /* Footer Navigation */
+        /* Footer */
         .footer {
             position: fixed;
             bottom: 0;
@@ -437,7 +170,6 @@
             border-top: 1px solid #ddd;
             padding: 10px 0;
             z-index: 150;
-            box-shadow: 0 -2px 5px rgba(0,0,0,0.05);
         }
 
         .nav-item {
@@ -448,20 +180,6 @@
             cursor: pointer;
             background: none;
             border: none;
-            padding: 8px 0;
-            transition: color 0.3s;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .nav-item i {
-            font-size: 20px;
-        }
-
-        .nav-item:hover {
-            color: var(--wa-teal);
         }
 
         .nav-item.active {
@@ -469,96 +187,48 @@
             font-weight: bold;
         }
 
-        /* Dropdown Menu */
+        /* Dropdown */
         .dropdown-content {
             display: none;
             position: absolute;
-            right: 15px;
-            top: 60px;
+            right: 10px;
+            top: 50px;
             background: white;
-            min-width: 220px;
+            min-width: 160px;
             box-shadow: 0 8px 16px rgba(0,0,0,0.2);
-            z-index: 1000;
-            border-radius: 8px;
+            z-index: 300;
+            border-radius: 4px;
             overflow: hidden;
-            border: 1px solid #ddd;
         }
 
-        .dropdown-content.show {
-            display: block;
-            animation: dropdownShow 0.2s;
-        }
-
-        @keyframes dropdownShow {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .dropdown-item {
-            display: flex;
-            align-items: center;
+        .dropdown-content a {
+            color: black;
             padding: 12px 16px;
-            color: #333;
             text-decoration: none;
+            display: block;
             font-size: 14px;
             border-bottom: 1px solid #eee;
-            background: white;
-            cursor: pointer;
-            transition: background 0.2s;
         }
 
-        .dropdown-item:hover {
-            background: #f5f5f5;
-        }
-
-        .dropdown-item i {
-            margin-right: 12px;
-            width: 20px;
-            text-align: center;
-            color: var(--wa-teal);
-        }
-
-        .dropdown-item:last-child {
-            border-bottom: none;
-            color: #d32f2f;
-        }
-
-        .dropdown-item:last-child i {
-            color: #d32f2f;
-        }
-
-        /* Floating Action Button */
+        /* FAB */
         .fab {
             position: fixed;
             right: 20px;
             bottom: 80px;
-            width: 60px;
-            height: 60px;
+            width: 55px;
+            height: 55px;
             background: var(--wa-green);
             border-radius: 50%;
             color: white;
             display: grid;
             place-items: center;
-            font-size: 30px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            font-size: 24px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
             cursor: pointer;
             z-index: 120;
-            border: none;
-            transition: transform 0.3s, box-shadow 0.3s;
         }
 
-        .fab:hover {
-            transform: scale(1.1) rotate(90deg);
-            box-shadow: 0 6px 20px rgba(0,0,0,0.4);
-        }
-
-        /* Modals */
+        /* Modal */
         .modal {
             position: fixed;
             inset: 0;
@@ -567,2121 +237,337 @@
             align-items: center;
             justify-content: center;
             z-index: 500;
-            animation: modalBg 0.3s;
-        }
-
-        @keyframes modalBg {
-            from { background: rgba(0,0,0,0); }
-            to { background: rgba(0,0,0,0.6); }
         }
 
         .modal-box {
             background: white;
-            padding: 25px;
-            border-radius: 12px;
+            padding: 20px;
+            border-radius: 10px;
             width: 90%;
-            max-width: 400px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-            animation: modalOpen 0.3s ease;
+            max-width: 350px;
         }
 
-        @keyframes modalOpen {
-            from {
-                transform: scale(0.9);
-                opacity: 0;
-            }
-            to {
-                transform: scale(1);
-                opacity: 1;
-            }
-        }
-
-        .modal-title {
-            margin-bottom: 20px;
-            color: var(--wa-teal);
-            text-align: center;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        .modal-box input, .modal-box select {
+        .modal-box input {
             width: 100%;
-            padding: 12px;
+            padding: 10px;
             margin: 10px 0;
             border: 1px solid #ddd;
-            border-radius: 8px;
-            font-size: 15px;
-            transition: border 0.3s;
-        }
-
-        .modal-box input:focus, .modal-box select:focus {
-            outline: none;
-            border-color: var(--wa-teal);
-            box-shadow: 0 0 0 2px rgba(7, 94, 84, 0.1);
-        }
-
-        .modal-actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
-        }
-
-        .btn-primary {
-            flex: 1;
-            padding: 12px;
-            background: var(--wa-teal);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background 0.3s;
-            font-size: 15px;
-        }
-
-        .btn-primary:hover {
-            background: #054d44;
-        }
-
-        .btn-secondary {
-            flex: 1;
-            padding: 12px;
-            background: #f0f0f0;
-            color: #555;
-            border: none;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background 0.3s;
-            font-size: 15px;
-        }
-
-        .btn-secondary:hover {
-            background: #e0e0e0;
-        }
-
-        /* Message Input */
-        .message-input-container {
-            padding: 10px;
-            background: #f0f0f0;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            border-top: 1px solid #ddd;
-        }
-
-        .message-input {
-            flex: 1;
-            padding: 12px 20px;
-            border-radius: 25px;
-            border: 1px solid #ddd;
-            outline: none;
-            font-size: 15px;
-            background: white;
-            transition: border 0.3s;
-        }
-
-        .message-input:focus {
-            border-color: var(--wa-teal);
-        }
-
-        .input-actions {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-
-        .input-actions i {
-            font-size: 22px;
-            color: #666;
-            cursor: pointer;
-            padding: 8px;
-            border-radius: 50%;
-            transition: background 0.2s;
-        }
-
-        .input-actions i:hover {
-            background: rgba(0,0,0,0.1);
-        }
-
-        .send-btn {
-            background: var(--wa-teal);
-            color: white;
-            border: none;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            font-size: 22px;
-            cursor: pointer;
-            display: grid;
-            place-items: center;
-            transition: background 0.3s;
-        }
-
-        .send-btn:hover {
-            background: #054d44;
-        }
-
-        .send-btn:disabled {
-            background: #cccccc;
-            cursor: not-allowed;
-        }
-
-        /* Welcome Screen */
-        .welcome-screen {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            background: white;
-            padding: 20px;
-            text-align: center;
-            animation: fadeIn 1s;
-        }
-
-        .welcome-icon {
-            font-size: 80px;
-            color: var(--wa-green);
-            margin-bottom: 20px;
-            animation: bounce 2s infinite;
-        }
-
-        @keyframes bounce {
-            0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
-            40% {transform: translateY(-20px);}
-            60% {transform: translateY(-10px);}
-        }
-
-        .welcome-text {
-            font-size: 18px;
-            color: #666;
-            margin-bottom: 30px;
-            max-width: 400px;
-            line-height: 1.6;
-        }
-
-        /* Empty State */
-        .empty-state {
-            text-align: center;
-            padding: 40px 20px;
-            color: #888;
-            animation: fadeIn 0.5s;
-        }
-
-        .empty-state i {
-            font-size: 50px;
-            margin-bottom: 15px;
-            color: #ccc;
-        }
-
-        /* Switch (Toggle) */
-        .switch {
-            position: relative;
-            display: inline-block;
-            width: 50px;
-            height: 24px;
-        }
-
-        .switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #ccc;
-            transition: .4s;
-            border-radius: 34px;
-        }
-
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 16px;
-            width: 16px;
-            left: 4px;
-            bottom: 4px;
-            background-color: white;
-            transition: .4s;
-            border-radius: 50%;
-        }
-
-        input:checked + .slider {
-            background-color: var(--wa-teal);
-        }
-
-        input:checked + .slider:before {
-            transform: translateX(26px);
-        }
-
-        /* Notification */
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: var(--wa-green);
-            color: white;
-            padding: 12px 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-            z-index: 1000;
-            display: none;
-            align-items: center;
-            gap: 10px;
-            animation: slideInRight 0.3s;
-        }
-
-        .notification.show {
-            display: flex;
-        }
-
-        /* Scrollbar Styling */
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: #888;
-            border-radius: 3px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: #555;
-        }
-
-        /* Loading Spinner */
-        .spinner {
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid var(--wa-teal);
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 20px auto;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* Context Menu */
-        .context-menu {
-            position: fixed;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-            z-index: 1000;
-            display: none;
-            min-width: 180px;
-            overflow: hidden;
-        }
-
-        .context-menu-item {
-            padding: 12px 16px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            border-bottom: 1px solid #eee;
-            transition: background 0.2s;
-        }
-
-        .context-menu-item:hover {
-            background: #f5f5f5;
-        }
-
-        .context-menu-item:last-child {
-            border-bottom: none;
+            border-radius: 5px;
         }
     </style>
 </head>
 <body>
 
-<!-- Header -->
 <header class="header">
-    <h2><i class="fab fa-whatsapp"></i> WhatsApp Pro</h2>
-    <div class="header-actions">
-        <i class="fas fa-search" onclick="toggleSearch()" title="સર્ચ કરો"></i>
-        <div style="position:relative;">
-            <i class="fas fa-ellipsis-v" onclick="toggleDropdown()" title="મેનૂ"></i>
-            <div id="dropdownMenu" class="dropdown-content">
-                <div class="dropdown-item" onclick="showProfile()">
-                    <i class="fas fa-user"></i> પ્રોફાઇલ
-                </div>
-                <div class="dropdown-item" onclick="showNewGroupModal()">
-                    <i class="fas fa-users"></i> નવું ગ્રુપ
-                </div>
-                <div class="dropdown-item" onclick="showArchivedChats()">
-                    <i class="fas fa-archive"></i> આર્કાઇવ્ડ ચેટ્સ
-                </div>
-                <div class="dropdown-item" onclick="showStarredMessages()">
-                    <i class="fas fa-star"></i> સ્ટાર કરેલા મેસેજ
-                </div>
-                <div class="dropdown-item" onclick="showSettings()">
-                    <i class="fas fa-cog"></i> સેટિંગ્સ
-                </div>
-                <div class="dropdown-item" onclick="logout()">
-                    <i class="fas fa-sign-out-alt"></i> લોગઆઉટ
-                </div>
-                <div class="dropdown-item" onclick="clearData()">
-                    <i class="fas fa-trash"></i> ડેટા ક્લિયર
-                </div>
-            </div>
+    <h2>WhatsApp</h2>
+    <div style="position:relative;">
+        <span onclick="toggleDropdown()" style="cursor:pointer; font-size:22px; padding:0 10px;">⋮</span>
+        <div id="dropdownMenu" class="dropdown-content">
+            <a href="#" onclick="showProfile()">પ્રોફાઇલ</a>
+            <a href="#" onclick="refreshApp()">રીફ્રેશ</a>
+            <a href="#" onclick="clearData()">ડેટા ક્લિયર</a>
         </div>
     </div>
 </header>
 
-<!-- Main App Content -->
 <div class="app-content">
-    <!-- Sidebar with Contact List -->
-    <section class="sidebar" id="sidebar">
-        <div class="search-container" id="searchContainer" style="display:none;">
-            <input type="text" class="search-box" id="searchInput" placeholder="સંપર્કો અને મેસેજ સર્ચ કરો..." onkeyup="filterChats()">
-            <i class="fas fa-times search-icon" onclick="toggleSearch()" style="cursor:pointer;"></i>
+    <section class="sidebar">
+        <div style="padding:10px;">
+            <input type="text" placeholder="સર્ચ કરો..." style="width:100%; padding:10px; border-radius:20px; border:none; background:#f0f2f5; outline:none;" onkeyup="filterChats()" id="searchInput">
         </div>
-        
-        <div class="chat-list" id="chatList">
-            <!-- Chat list will be loaded by JavaScript -->
-        </div>
+        <div class="chat-list" id="chatList"></div>
     </section>
 
-    <!-- Chat Window -->
     <section class="chat-window" id="chatPanel">
         <div class="chat-header">
-            <button class="back-btn" id="backBtn" onclick="closeChat()">
-                <i class="fas fa-arrow-left"></i>
-            </button>
-            <div id="chatAvatar" class="avatar">?</div>
-            <div class="header-info">
-                <b id="chatName" style="font-size:17px;">ચેટ પસંદ કરો</b><br>
-                <div class="status-indicator" id="chatStatus">
-                    <span id="chatNum" style="font-size:13px; color:#666;">ચેટ શરૂ કરવા માટે સંપર્ક પસંદ કરો</span>
-                </div>
-            </div>
-            <div class="chat-actions">
-                <i class="fas fa-phone-alt" onclick="makeCall()" title="કૉલ કરો"></i>
-                <i class="fas fa-video" onclick="makeVideoCall()" title="વીડિઓ કૉલ"></i>
-                <i class="fas fa-info-circle" onclick="showContactInfo()" title="માહિતી"></i>
+            <button onclick="closeChat()" id="backBtn" style="border:none; background:none; font-size:20px; margin-right:10px; display:none;">←</button>
+            <div id="chatAvatar" class="avatar" style="width:40px; height:40px; font-size:16px;">?</div>
+            <div style="flex:1">
+                <b id="chatName" style="font-size:16px;">ચેટ પસંદ કરો</b><br>
+                <small id="chatNum" style="color:#666; font-size:11px;"></small>
             </div>
         </div>
-        
         <div class="chat-body" id="chatBody">
-            <!-- Welcome screen when no chat is selected -->
-            <div class="welcome-screen" id="welcomeScreen">
-                <div class="welcome-icon">
-                    <i class="fab fa-whatsapp"></i>
-                </div>
-                <h2 style="color:#075E54; margin-bottom:15px;">WhatsApp Pro માં આપનું સ્વાગત છે</h2>
-                <p class="welcome-text">
-                    આ એક સંપૂર્ણ ફંક્શનલ WhatsApp ક્લોન છે. તમે નવા સંપર્કો ઉમેરી શકો છો, મેસેજ મોકલી શકો છો, અને રીઅલ-ટાઈમ ચેટ કરી શકો છો.
-                </p>
-                <button class="btn-primary" onclick="showAddContactModal()" style="padding:12px 30px; border-radius:25px;">
-                    <i class="fas fa-user-plus"></i> નવો સંપર્ક ઉમેરો
-                </button>
-                <p style="margin-top:20px; font-size:14px; color:#888;">
-                    ડેવલપર: દેવેન્દ્રભાઈ | વર્ઝન: 3.0
-                </p>
+            <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:20px;">
+                <div style="font-size:60px; color:#25D366; margin-bottom:20px;">💬</div>
+                <h3 style="color:#075E54; margin-bottom:10px;">WhatsApp Pro</h3>
+                <p style="color:#666; max-width:300px;">ચેટ શરૂ કરવા માટે સંપર્ક પસંદ કરો</p>
             </div>
         </div>
-        
-        <!-- Message Input Area -->
-        <div class="message-input-container" id="messageInputContainer" style="display:none;">
-            <div class="input-actions">
-                <i class="far fa-smile" onclick="toggleEmojiPicker()" title="ઇમોજી"></i>
-                <i class="fas fa-paperclip" onclick="showAttachmentMenu()" title="એટેચમેન્ટ"></i>
-            </div>
-            <input type="text" class="message-input" id="msgInput" placeholder="મેસેજ ટાઈપ કરો..." onkeypress="handleKeyPress(event)" autocomplete="off">
-            <button class="send-btn" id="sendBtn" onclick="sendMsg()" disabled>
-                <i class="fas fa-paper-plane"></i>
-            </button>
+        <div style="padding:10px; background:#f0f0f0; display:none; align-items:center; gap:10px;" id="messageInputContainer">
+            <input type="text" id="msgInput" placeholder="મેસેજ ટાઈપ કરો" style="flex:1; padding:12px; border-radius:25px; border:none; outline:none;" onkeypress="handleKeyPress(event)">
+            <button onclick="sendMsg()" style="background:var(--wa-teal); color:white; border:none; width:45px; height:45px; border-radius:50%; font-size:20px; cursor:pointer;">➤</button>
         </div>
     </section>
 </div>
 
-<!-- Floating Action Button -->
-<button class="fab" onclick="showAddContactModal()" title="નવો સંપર્ક ઉમેરો">
-    <i class="fas fa-comment-medical"></i>
-</button>
+<div class="fab" onclick="showAddContactModal()">+</div>
 
-<!-- Bottom Navigation -->
 <nav class="footer">
-    <button class="nav-item active" onclick="showChats()">
-        <i class="fas fa-comments"></i>
-        <span>ચેટ</span>
-    </button>
-    <button class="nav-item" onclick="showStatus()">
-        <i class="fas fa-circle"></i>
-        <span>સ્ટેટસ</span>
-    </button>
-    <button class="nav-item" onclick="showCalls()">
-        <i class="fas fa-phone"></i>
-        <span>કૉલ્સ</span>
-    </button>
-    <button class="nav-item" onclick="showSettings()">
-        <i class="fas fa-cog"></i>
-        <span>સેટિંગ્સ</span>
-    </button>
+    <button class="nav-item active">💬<br>ચેટ</button>
+    <button class="nav-item" onclick="alert('અપડેટ ટૂંક સમયમાં')">🔔<br>અપડેટ</button>
+    <button class="nav-item" onclick="alert('કોમ્યુનિટી ટૂંક સમયમાં')">👥<br>કોમ્યુનિટી</button>
 </nav>
 
-<!-- Notification -->
-<div id="notification" class="notification">
-    <i class="fas fa-check-circle"></i>
-    <span id="notificationText"></span>
-</div>
-
-<!-- Add Contact Modal -->
 <div id="addModal" class="modal">
     <div class="modal-box">
-        <h3 class="modal-title"><i class="fas fa-user-plus"></i> નવો સંપર્ક ઉમેરો</h3>
-        <input type="text" id="newName" placeholder="સંપર્કનું નામ *" autofocus>
-        <input type="tel" id="newPhone" placeholder="મોબાઇલ નંબર * (ઉદા: 9876543210)">
-        <select id="newStatus">
-            <option value="online">🟢 ઓનલાઇન</option>
-            <option value="offline">⚫ ઑફલાઇન</option>
-            <option value="lastSeen">🕐 છેલ્લો જોયેલ</option>
-        </select>
-        <div class="modal-actions">
-            <button class="btn-primary" onclick="addContact()">સંપર્ક ઉમેરો</button>
-            <button class="btn-secondary" onclick="closeModal('addModal')">રદ કરો</button>
-        </div>
+        <h3>નવો સંપર્ક</h3>
+        <input type="text" id="newName" placeholder="નામ">
+        <input type="text" id="newPhone" placeholder="મોબાઇલ નંબર">
+        <button onclick="addContact()" style="width:100%; padding:12px; background:var(--wa-teal); color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">ઉમેરો</button>
+        <button onclick="closeModal('addModal')" style="width:100%; padding:10px; border:none; color:red; margin-top:5px; background:none; cursor:pointer;">રદ કરો</button>
     </div>
 </div>
 
-<!-- Profile Modal -->
 <div id="profileModal" class="modal">
     <div class="modal-box">
-        <h3 class="modal-title"><i class="fas fa-user-circle"></i> તમારી પ્રોફાઇલ</h3>
+        <h3>પ્રોફાઇલ</h3>
         <div style="text-align:center; margin:20px 0;">
-            <div class="avatar" style="width:100px; height:100px; margin:0 auto 15px; font-size:40px; background:linear-gradient(135deg, #667eea, #764ba2);">
-                <i class="fas fa-user"></i>
-            </div>
-            <h3>દેવેન્દ્રભાઈ</h3>
-            <p style="color:#666; margin-top:5px;">+91 98765 43210</p>
-            <p style="color:#888; margin-top:10px; font-size:14px;">
-                <i class="fas fa-circle" style="color:#25D366; font-size:10px;"></i> ઓનલાઇન
-            </p>
+            <div class="avatar" style="width:80px; height:80px; margin:0 auto 15px; font-size:30px;">👤</div>
+            <h3>WhatsApp Pro</h3>
+            <p style="color:#666; margin-top:10px;">વર્ઝન 1.0</p>
         </div>
-        <div style="margin:20px 0;">
-            <div style="background:#f9f9f9; padding:15px; border-radius:8px; margin-bottom:15px;">
-                <h4 style="margin-bottom:10px; color:#075E54;">WhatsApp Pro વર્ઝન 3.0</h4>
-                <p style="color:#666; font-size:14px;">આ એક સંપૂર્ણ ફંક્શનલ WhatsApp ક્લોન એપ્લિકેશન છે. બધા ડેટા તમારા બ્રાઉઝરમાં સંગ્રહિત થાય છે.</p>
-            </div>
-        </div>
-        <div class="modal-actions">
-            <button class="btn-primary" onclick="editProfile()">એડિટ પ્રોફાઇલ</button>
-            <button class="btn-secondary" onclick="closeModal('profileModal')">બંધ કરો</button>
-        </div>
-    </div>
-</div>
-
-<!-- Settings Modal -->
-<div id="settingsModal" class="modal">
-    <div class="modal-box">
-        <h3 class="modal-title"><i class="fas fa-cog"></i> સેટિંગ્સ</h3>
-        <div style="margin:20px 0;">
-            <div style="margin-bottom:20px;">
-                <h4 style="margin-bottom:10px; color:#075E54;">નોટિફિકેશન</h4>
-                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:15px;">
-                    <span>મેસેજ નોટિફિકેશન</span>
-                    <label class="switch">
-                        <input type="checkbox" id="notifications" checked>
-                        <span class="slider"></span>
-                    </label>
-                </div>
-                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:15px;">
-                    <span>ધ્વનિ સૂચના</span>
-                    <label class="switch">
-                        <input type="checkbox" id="sound" checked>
-                        <span class="slider"></span>
-                    </label>
-                </div>
-            </div>
-            
-            <div style="margin-bottom:20px;">
-                <h4 style="margin-bottom:10px; color:#075E54;">ડિસ્પ્લે</h4>
-                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:15px;">
-                    <span>ડાર્ક મોડ</span>
-                    <label class="switch">
-                        <input type="checkbox" id="darkMode" onchange="toggleDarkMode()">
-                        <span class="slider"></span>
-                    </label>
-                </div>
-                <div style="display:flex; align-items:center; justify-content:space-between;">
-                    <span>વૉલપેપર બદલો</span>
-                    <button class="btn-secondary" style="padding:8px 15px; font-size:13px;" onclick="changeWallpaper()">બદલો</button>
-                </div>
-            </div>
-            
-            <div style="background:#f9f9f9; padding:15px; border-radius:8px; margin:20px 0;">
-                <h4 style="margin-bottom:10px; color:#075E54;">એપ્લિકેશન માહિતી</h4>
-                <p><strong>વર્ઝન:</strong> WhatsApp Pro v3.0</p>
-                <p><strong>ડેવલપર:</strong> દેવેન્દ્રભાઈ</p>
-                <p><strong>બિલ્ડ:</strong> Vidushi Bot Edition</p>
-                <p><strong>ડેટા:</strong> <span id="dataCount">0 સંપર્કો, 0 મેસેજ</span></p>
-            </div>
-        </div>
-        <div class="modal-actions">
-            <button class="btn-primary" onclick="saveSettings()">સેટિંગ્સ સેવ કરો</button>
-            <button class="btn-secondary" onclick="closeModal('settingsModal')">બંધ કરો</button>
-        </div>
-    </div>
-</div>
-
-<!-- New Group Modal -->
-<div id="groupModal" class="modal">
-    <div class="modal-box">
-        <h3 class="modal-title"><i class="fas fa-users"></i> નવું ગ્રુપ બનાવો</h3>
-        <input type="text" id="groupName" placeholder="ગ્રુપનું નામ *" autofocus>
-        <select id="groupPrivacy" style="margin-bottom:15px;">
-            <option value="public">સાર્વજનિક ગ્રુપ</option>
-            <option value="private">ખાનગી ગ્રુપ</option>
-        </select>
-        <div id="groupContacts" style="max-height:200px; overflow-y:auto; margin:10px 0; padding:10px; border:1px solid #eee; border-radius:8px;">
-            <!-- Group contacts will be added here -->
-        </div>
-        <div class="modal-actions">
-            <button class="btn-primary" onclick="createGroup()">ગ્રુપ બનાવો</button>
-            <button class="btn-secondary" onclick="closeModal('groupModal')">રદ કરો</button>
-        </div>
-    </div>
-</div>
-
-<!-- Context Menu -->
-<div id="contextMenu" class="context-menu">
-    <div class="context-menu-item" onclick="deleteMessage()">
-        <i class="fas fa-trash" style="color:#d32f2f;"></i>
-        <span>મેસેજ ડીલીટ કરો</span>
-    </div>
-    <div class="context-menu-item" onclick="forwardMessage()">
-        <i class="fas fa-share"></i>
-        <span>ફોરવર્ડ કરો</span>
-    </div>
-    <div class="context-menu-item" onclick="starMessage()">
-        <i class="far fa-star"></i>
-        <span>સ્ટાર કરો</span>
-    </div>
-    <div class="context-menu-item" onclick="copyMessage()">
-        <i class="far fa-copy"></i>
-        <span>કોપી કરો</span>
+        <button onclick="closeModal('profileModal')" style="width:100%; padding:12px; background:#f0f0f0; color:#555; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">બંધ કરો</button>
     </div>
 </div>
 
 <script>
-// ====================
-// GLOBAL VARIABLES
-// ====================
-let state = JSON.parse(localStorage.getItem('whatsapp_pro_state')) || {
-    contacts: [],
-    chats: {},
-    starred: [],
-    archived: [],
-    settings: {
-        notifications: true,
-        sound: true,
-        darkMode: false,
-        wallpaper: 'default'
-    },
-    user: {
-        name: "દેવેન્દ્રભાઈ",
-        phone: "9876543210",
-        status: "હેલો! હું WhatsApp Pro વાપરું છું.",
-        avatar: "D"
-    }
-};
-
-let activeChatId = null;
-let messageIdCounter = 1000;
-let isTyping = false;
-let typingTimeout = null;
-let selectedContactIds = [];
-
-// ====================
-// UTILITY FUNCTIONS
-// ====================
+// સમય ફંક્શન
 function getCurrentTime() {
     const now = new Date();
     let hours = now.getHours();
     let minutes = now.getMinutes();
-    const ampm = hours >= 12 ? 'PM' : 'AM';
     hours = hours % 12;
     hours = hours ? hours : 12;
     minutes = minutes < 10 ? '0' + minutes : minutes;
-    return hours + ':' + minutes + ' ' + ampm;
+    return hours + ':' + minutes + ' ' + (now.getHours() >= 12 ? 'PM' : 'AM');
 }
 
-function getCurrentDate() {
-    const now = new Date();
-    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-    return now.toLocaleDateString('gu-IN', options);
-}
-
-function showNotification(message, type = 'success') {
-    const notification = document.getElementById('notification');
-    const notificationText = document.getElementById('notificationText');
-    
-    notificationText.textContent = message;
-    notification.style.background = type === 'success' ? '#25D366' : type === 'error' ? '#d32f2f' : '#34B7F1';
-    notification.classList.add('show');
-    
-    setTimeout(() => {
-        notification.classList.remove('show');
-    }, 3000);
-}
-
-function saveState() {
-    localStorage.setItem('whatsapp_pro_state', JSON.stringify(state));
-    updateDataCount();
-}
-
-function updateDataCount() {
-    const contactCount = state.contacts.length;
-    let messageCount = 0;
-    Object.values(state.chats).forEach(chat => {
-        messageCount += chat.length;
-    });
-    
-    document.getElementById('dataCount').textContent = `${contactCount} સંપર્કો, ${messageCount} મેસેજ`;
-}
-
-// ====================
-// INITIALIZATION
-// ====================
-function initializeApp() {
-    // Load initial sample data if empty
-    if (state.contacts.length === 0) {
-        loadSampleData();
-    }
-    
-    // Apply settings
-    applySettings();
-    
-    // Render UI
-    renderChatList();
-    updateDataCount();
-    
-    // Set up event listeners
-    setupEventListeners();
-    
-    // Show welcome message
-    console.log('WhatsApp Pro v3.0 initialized successfully!');
-    console.log('Developer: દેવેન્દ્રભાઈ | Vidushi Bot Edition');
-}
-
-function loadSampleData() {
-    state.contacts = [
-        {
-            id: 1,
-            name: "વિધુષી બોટ",
-            phone: "98765 43210",
-            lastMsg: "હેલો! હું WhatsApp Pro બોટ છું.",
-            lastTime: getCurrentTime(),
-            status: "online",
-            unread: 0,
-            avatar: "V"
-        },
-        {
-            id: 2,
-            name: "રમેશભાઈ",
-            phone: "98765 43211",
-            lastMsg: "મીટિંગ માટે થેંક્યુ",
-            lastTime: "10:30 AM",
-            status: "lastSeen",
-            unread: 2,
-            avatar: "R"
-        },
-        {
-            id: 3,
-            name: "સીતાબેન",
-            phone: "98765 43212",
-            lastMsg: "કાલે મળીશું",
-            lastTime: "ગઈકાલે",
-            status: "offline",
-            unread: 1,
-            avatar: "S"
-        },
-        {
-            id: 4,
-            name: "જીગારભાઈ",
-            phone: "98765 43213",
-            lastMsg: "શુભ સાંજ",
-            lastTime: "સોમવાર",
-            status: "online",
-            unread: 0,
-            avatar: "J"
-        }
-    ];
-
-    state.chats = {
+// સ્ટેટ
+let state = JSON.parse(localStorage.getItem('wa_state')) || {
+    contacts: [
+        {id: 1, name: "વિધુષી બોટ", phone: "9876543210", lastMsg: "હેલો! હું બોટ છું", lastTime: getCurrentTime()}
+    ],
+    chats: {
         1: [
-            { id: 1, from: 'them', text: 'હેલો! હું WhatsApp Pro બોટ છું.', time: '10:00 AM' },
-            { id: 2, from: 'me', text: 'હેલો! કેમ છો?', time: '10:01 AM' },
-            { id: 3, from: 'them', text: 'હું મજામાં છું! તમને કેવી મદદ કરી શકું?', time: '10:02 AM' }
-        ],
-        2: [
-            { id: 4, from: 'them', text: 'કાલની મીટિંગ માટે થેંક્યુ', time: 'ગઈકાલે 3:45 PM' },
-            { id: 5, from: 'me', text: 'તમારું સ્વાગત છે! મીટિંગ શી હતી?', time: 'આજે 10:15 AM' }
-        ],
-        3: [
-            { id: 6, from: 'them', text: 'કાલે સાંજે મળીશું', time: 'સોમવાર 2:30 PM' },
-            { id: 7, from: 'me', text: 'ઠીક છે, ખાસ ધ્યાન રાખજો', time: 'સોમવાર 2:35 PM' }
+            {id: 1, from: 'them', text: 'હેલો! હું WhatsApp બોટ છું', time: getCurrentTime()}
         ]
-    };
-
-    saveState();
-}
-
-function applySettings() {
-    if (state.settings.darkMode) {
-        document.documentElement.style.setProperty('--bg', '#0a0a0a');
-        document.documentElement.style.setProperty('--white', '#1a1a1a');
-        document.documentElement.style.setProperty('--text', '#eee');
-        document.documentElement.style.setProperty('--muted', '#aaa');
-        document.body.style.backgroundColor = '#121212';
     }
-    
-    document.getElementById('notifications').checked = state.settings.notifications;
-    document.getElementById('sound').checked = state.settings.sound;
-    document.getElementById('darkMode').checked = state.settings.darkMode;
-}
+};
 
-// ====================
-// CHAT LIST RENDERING
-// ====================
+let activeChatId = null;
+
+// ચેટ લિસ્ટ
 function renderChatList() {
     const list = document.getElementById('chatList');
-    
-    if (state.contacts.length === 0) {
-        list.innerHTML = `
-            <div class="empty-state">
-                <i class="fas fa-comments"></i>
-                <h3>કોઈ ચેટ્સ નથી</h3>
-                <p>નવો સંપર્ક ઉમેરવા માટે નીચેના + બટન પર ક્લિક કરો</p>
-                <button class="btn-primary" onclick="showAddContactModal()" style="margin-top:15px; padding:10px 20px;">
-                    <i class="fas fa-user-plus"></i> પહેલો સંપર્ક ઉમેરો
-                </button>
-            </div>
-        `;
-        return;
-    }
-    
     list.innerHTML = '';
     
-    state.contacts.forEach(contact => {
+    state.contacts.forEach(c => {
         const row = document.createElement('div');
-        row.className = `chat-row ${contact.unread > 0 ? 'unread' : ''} ${activeChatId === contact.id ? 'active' : ''}`;
-        
-        row.onclick = () => openChat(contact.id);
-        row.oncontextmenu = (e) => {
-            e.preventDefault();
-            showContactContextMenu(e, contact.id);
-        };
-        
-        const statusIcon = contact.status === 'online' ? 
-            '<div class="online-dot"></div> ઓનલાઇન' : 
-            contact.status === 'lastSeen' ? 
-            '🕐 છેલ્લો જોયેલ' : 
-            '⚫ ઑફલાઇન';
+        row.className = 'chat-row';
+        row.onclick = () => openChat(c.id);
         
         row.innerHTML = `
-            <div class="avatar">${contact.avatar || contact.name[0]}</div>
-            <div class="chat-info">
-                <div class="chat-header-row">
-                    <div class="chat-name">${contact.name}</div>
-                    <div class="chat-time">${contact.lastTime}</div>
+            <div class="avatar">${c.name[0]}</div>
+            <div style="flex:1; min-width:0;">
+                <div style="display:flex; justify-content:space-between;">
+                    <b style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${c.name}</b>
+                    <span style="font-size:10px; color:#888;">${c.lastTime || ''}</span>
                 </div>
-                <div class="chat-preview">
-                    ${contact.lastMsg || 'તમારું સ્વાગત છે'}
-                </div>
-                <div class="status-indicator">
-                    ${statusIcon}
-                </div>
+                <small style="color:#666; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; display:block;">${c.lastMsg}</small>
             </div>
-            ${contact.unread > 0 ? `<div class="unread-badge">${contact.unread}</div>` : ''}
         `;
-        
         list.appendChild(row);
     });
 }
 
-// ====================
-// CHAT FUNCTIONS
-// ====================
+// ચેટ ખોલો
 function openChat(chatId) {
     activeChatId = chatId;
     const contact = state.contacts.find(c => c.id === chatId);
     
-    if (!contact) return;
+    document.getElementById('chatName').innerText = contact.name;
+    document.getElementById('chatNum').innerText = contact.phone;
+    document.getElementById('chatAvatar').innerText = contact.name[0];
     
-    // Update header
-    document.getElementById('chatName').textContent = contact.name;
-    document.getElementById('chatNum').textContent = contact.phone;
-    document.getElementById('chatAvatar').textContent = contact.avatar || contact.name[0];
-    
-    // Update status
-    let statusText = '';
-    if (contact.status === 'online') {
-        statusText = '<div class="online-dot"></div> ઓનલાઇન';
-    } else if (contact.status === 'lastSeen') {
-        statusText = `🕐 છેલ્લો જોયેલ ${contact.lastTime}`;
-    } else {
-        statusText = '⚫ ઑફલાઇન';
-    }
-    document.getElementById('chatStatus').innerHTML = statusText;
-    
-    // Show typing indicator for bot
-    if (contact.name.includes('બોટ')) {
-        setTimeout(() => {
-            showTypingIndicator(chatId);
-        }, 500);
-    }
-    
-    // Reset unread count
-    contact.unread = 0;
-    
-    // Mobile view handling
-    if (window.innerWidth <= 900) {
-        document.getElementById('sidebar').classList.add('hidden');
-        document.getElementById('chatPanel').classList.add('active');
+    if(window.innerWidth <= 900) {
+        document.getElementById('chatPanel').style.display = 'flex';
         document.getElementById('backBtn').style.display = 'block';
     }
     
-    // Show message input
     document.getElementById('messageInputContainer').style.display = 'flex';
     document.getElementById('msgInput').focus();
     
-    // Hide welcome screen
-    document.getElementById('welcomeScreen').style.display = 'none';
-    
-    // Render messages
-    renderMessages();
-    
-    // Update chat list
-    renderChatList();
-    
-    // Save state
-    saveState();
+    renderMsgs();
 }
 
-function renderMessages() {
+// મેસેજ બતાવો
+function renderMsgs() {
     const body = document.getElementById('chatBody');
-    
-    // Hide welcome screen
-    const welcomeScreen = document.getElementById('welcomeScreen');
-    if (welcomeScreen) {
-        welcomeScreen.style.display = 'none';
-    }
-    
-    if (!activeChatId || !state.chats[activeChatId] || state.chats[activeChatId].length === 0) {
-        body.innerHTML = `
-            <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:20px;">
-                <div class="avatar" style="width:80px; height:80px; margin-bottom:15px; font-size:30px;">
-                    ${state.contacts.find(c => c.id === activeChatId)?.avatar || state.contacts.find(c => c.id === activeChatId)?.name[0] || '?'}
-                </div>
-                <h3 style="color:#075E54; margin-bottom:10px;">
-                    ${state.contacts.find(c => c.id === activeChatId)?.name || 'અજાણ્યા'}
-                </h3>
-                <p style="color:#666; max-width:300px; margin-bottom:20px;">
-                    તમે અને ${state.contacts.find(c => c.id === activeChatId)?.name || 'અજાણ્યા'} વચ્ચે હજી કોઈ મેસેજ નથી.
-                </p>
-                <p style="color:#888; font-size:14px;">
-                    હેલો મેસેજ મોકલીને ચેટ શરૂ કરો!
-                </p>
-            </div>
-        `;
-        return;
-    }
-    
     body.innerHTML = '';
     
-    const messages = state.chats[activeChatId];
-    
-    // Add date separator
-    const dateSeparator = document.createElement('div');
-    dateSeparator.style.textAlign = 'center';
-    dateSeparator.style.margin = '10px 0';
-    dateSeparator.style.color = '#888';
-    dateSeparator.style.fontSize = '12px';
-    dateSeparator.textContent = getCurrentDate();
-    body.appendChild(dateSeparator);
-    
-    messages.forEach(msg => {
-        const bubble = document.createElement('div');
-        bubble.className = `bubble ${msg.from}`;
-        bubble.oncontextmenu = (e) => {
-            e.preventDefault();
-            showMessageContextMenu(e, msg.id);
-        };
-        
-        const timeWithStatus = msg.from === 'me' ? 
-            `${msg.time} <span class="message-status">✓✓</span>` : 
-            msg.time;
-        
-        bubble.innerHTML = `
-            <div>${msg.text}</div>
-            <div class="m-time">${timeWithStatus}</div>
-        `;
-        
-        body.appendChild(bubble);
+    (state.chats[activeChatId] || []).forEach(m => {
+        const b = document.createElement('div');
+        b.className = `bubble ${m.from}`;
+        b.innerHTML = `<div>${m.text}</div><div class="m-time">${m.time}</div>`;
+        body.appendChild(b);
     });
     
-    // Scroll to bottom
     body.scrollTop = body.scrollHeight;
 }
 
+// મેસેજ મોકલો
 function sendMsg() {
     const input = document.getElementById('msgInput');
     const text = input.value.trim();
+    if(!text || !activeChatId) return;
     
-    if (!text || !activeChatId) return;
-    
-    // Create message object
-    messageIdCounter++;
     const time = getCurrentTime();
-    const message = {
-        id: messageIdCounter,
-        from: 'me',
-        text: text,
-        time: time
-    };
+    if(!state.chats[activeChatId]) state.chats[activeChatId] = [];
     
-    // Add to chat
-    if (!state.chats[activeChatId]) {
-        state.chats[activeChatId] = [];
-    }
-    state.chats[activeChatId].push(message);
+    state.chats[activeChatId].push({id: Date.now(), from:'me', text:text, time: time});
     
-    // Update contact's last message
     const contact = state.contacts.find(c => c.id === activeChatId);
-    if (contact) {
-        contact.lastMsg = text;
-        contact.lastTime = time;
-        contact.unread = 0;
-    }
+    contact.lastMsg = text;
+    contact.lastTime = time;
     
-    // Clear input and disable send button
     input.value = '';
-    document.getElementById('sendBtn').disabled = true;
-    
-    // Render messages
-    renderMessages();
+    saveState();
+    renderMsgs();
     renderChatList();
     
-    // Save state
-    saveState();
-    
-    // Show notification
-    if (state.settings.notifications) {
-        showNotification('મેસેજ મોકલવામાં આવ્યો', 'success');
-    }
-    
-    // Auto-reply for bot contacts
-    if (contact && contact.name.includes('બોટ')) {
-        setTimeout(() => {
-            autoReply(text, contact.id);
-        }, 1000 + Math.random() * 2000);
+    // બોટ જવાબ
+    if(contact.name.includes('બોટ')) {
+        setTimeout(() => botReply(text, contact.id), 1000);
     }
 }
 
-function autoReply(userMessage, contactId) {
+// બોટ જવાબ
+function botReply(userMsg, contactId) {
     const replies = {
-        'હાય': 'હાય! તમે કેમ છો?',
-        'હેલો': 'હેલો! હું WhatsApp Pro બોટ છું.',
-        'કેમ છો': 'હું મજામાં છું! તમે કેમ છો?',
-        'નામ': 'મારું નામ વિધુષી બોટ છે.',
-        'સમય': `હમણાં સમય છે: ${getCurrentTime()}`,
-        'તારી ઉંમર': 'હું એક કાર્યક્રમ છું, મારી ઉંમર નથી!',
-        'જય શ્રી કૃષ્ણ': 'જય શ્રી કૃષ્ણ! હરિ ભજનમાં સ્વાગત છે.',
-        'આભાર': 'તમારું સ્વાગત છે!',
-        'બાય': 'બાય! ફરી મળીશું.',
-        'સુપ્રભાત': 'સુપ્રભાત! શુભ પ્રભાત.',
-        'શુભ રાત્રી': 'શુભ રાત્રી, સુખદ સ્વપ્નાં.'
+        'હાય': 'હાય! કેમ છો?',
+        'હેલો': 'હેલો! હું બોટ છું',
+        'કેમ છો': 'હું મજામાં છું',
+        'નામ': 'મારું નામ વિધુષી બોટ છે',
+        'સમય': `સમય: ${getCurrentTime()}`,
+        'આભાર': 'તમારું સ્વાગત છે'
     };
     
-    const msg = userMessage.toLowerCase();
-    let reply = 'સમજાયું!';
+    let reply = 'સમજાયું';
+    const msg = userMsg.toLowerCase();
     
-    for (const [key, value] of Object.entries(replies)) {
-        if (msg.includes(key.toLowerCase())) {
+    for(const [key, value] of Object.entries(replies)) {
+        if(msg.includes(key.toLowerCase())) {
             reply = value;
             break;
         }
     }
     
-    // Add typing indicator
-    showTypingIndicator(contactId);
+    const time = getCurrentTime();
+    state.chats[contactId].push({id: Date.now(), from:'them', text:reply, time: time});
     
-    // Send reply after delay
-    setTimeout(() => {
-        messageIdCounter++;
-        const time = getCurrentTime();
-        const botMessage = {
-            id: messageIdCounter,
-            from: 'them',
-            text: reply,
-            time: time
-        };
-        
-        if (!state.chats[contactId]) {
-            state.chats[contactId] = [];
-        }
-        state.chats[contactId].push(botMessage);
-        
-        // Update contact
-        const contact = state.contacts.find(c => c.id === contactId);
-        if (contact) {
-            contact.lastMsg = reply;
-            contact.lastTime = time;
-            contact.unread = (contact.unread || 0) + 1;
-        }
-        
-        // Render updates
-        if (activeChatId === contactId) {
-            renderMessages();
-        }
-        renderChatList();
-        saveState();
-    }, 1500);
-}
-
-function showTypingIndicator(contactId) {
-    if (activeChatId !== contactId) return;
+    const contact = state.contacts.find(c => c.id === contactId);
+    contact.lastMsg = reply;
+    contact.lastTime = time;
     
-    const body = document.getElementById('chatBody');
-    const typingIndicator = document.createElement('div');
-    typingIndicator.className = 'typing-indicator';
-    typingIndicator.innerHTML = `
-        <div class="typing-dot"></div>
-        <div class="typing-dot"></div>
-        <div class="typing-dot"></div>
-    `;
-    
-    body.appendChild(typingIndicator);
-    body.scrollTop = body.scrollHeight;
-}
-
-function closeChat() {
-    activeChatId = null;
-    
-    document.getElementById('sidebar').classList.remove('hidden');
-    document.getElementById('chatPanel').classList.remove('active');
-    document.getElementById('backBtn').style.display = 'none';
-    
-    document.getElementById('messageInputContainer').style.display = 'none';
-    document.getElementById('welcomeScreen').style.display = 'flex';
-    
+    saveState();
+    if(activeChatId === contactId) renderMsgs();
     renderChatList();
 }
 
-// ====================
-// CONTACT MANAGEMENT
-// ====================
-function showAddContactModal() {
-    document.getElementById('addModal').style.display = 'flex';
-    document.getElementById('newName').focus();
-}
-
+// સંપર્ક ઉમેરો
 function addContact() {
-    const name = document.getElementById('newName').value.trim();
-    const phone = document.getElementById('newPhone').value.trim();
-    const status = document.getElementById('newStatus').value;
-    
-    if (!name || !phone) {
-        showNotification('કૃપા કરીને નામ અને ફોન નંબર ભરો', 'error');
-        return;
-    }
-    
-    // Validate phone number
-    if (!/^\d{10}$/.test(phone.replace(/\D/g, ''))) {
-        showNotification('માન્ય 10-અંકનો ફોન નંબર દાખલ કરો', 'error');
-        return;
-    }
+    const n = document.getElementById('newName').value.trim();
+    const p = document.getElementById('newPhone').value.trim();
+    if(!n || !p) { alert('નામ અને નંબર લખો'); return; }
     
     const id = Date.now();
-    const contact = {
-        id: id,
-        name: name,
-        phone: phone,
-        lastMsg: 'હેલો!',
-        lastTime: getCurrentTime(),
-        status: status,
-        unread: 0,
-        avatar: name[0]
-    };
-    
-    state.contacts.push(contact);
+    state.contacts.push({id, name:n, phone:p, lastMsg:'', lastTime: ''});
     state.chats[id] = [];
-    
+    saveState();
+    renderChatList();
     closeModal('addModal');
-    
-    // Clear form
     document.getElementById('newName').value = '';
     document.getElementById('newPhone').value = '';
-    
-    renderChatList();
-    saveState();
-    
-    showNotification(`${name} સફળતાપૂર્વક ઉમેરાયા`, 'success');
-    
-    // Auto open chat with new contact
-    setTimeout(() => openChat(id), 500);
 }
 
-// ====================
-// MODAL FUNCTIONS
-// ====================
-function closeModal(modalId) {
-    document.getElementById(modalId).style.display = 'none';
-}
-
+// ડ્રોપડાઉન
 function toggleDropdown() {
-    const dropdown = document.getElementById("dropdownMenu");
-    dropdown.classList.toggle("show");
+    const d = document.getElementById("dropdownMenu");
+    d.style.display = (d.style.display === "block") ? "none" : "block";
 }
 
+// મોડલ બંધ
+function closeModal(id) {
+    document.getElementById(id).style.display = 'none';
+}
+
+// પ્રોફાઇલ
 function showProfile() {
     toggleDropdown();
     document.getElementById('profileModal').style.display = 'flex';
 }
 
-function showSettings() {
+// રીફ્રેશ
+function refreshApp() {
     toggleDropdown();
-    document.getElementById('settingsModal').style.display = 'flex';
-}
-
-function saveSettings() {
-    state.settings.notifications = document.getElementById('notifications').checked;
-    state.settings.sound = document.getElementById('sound').checked;
-    state.settings.darkMode = document.getElementById('darkMode').checked;
-    
-    saveState();
-    applySettings();
-    closeModal('settingsModal');
-    showNotification('સેટિંગ્સ સેવ કરવામાં આવી', 'success');
-}
-
-function toggleDarkMode() {
-    state.settings.darkMode = document.getElementById('darkMode').checked;
-    applySettings();
-    saveState();
-}
-
-function editProfile() {
-    const newName = prompt('તમારું નવું નામ દાખલ કરો:', state.user.name);
-    if (newName && newName.trim()) {
-        state.user.name = newName.trim();
-        state.user.avatar = newName.trim()[0];
-        saveState();
-        showNotification('પ્રોફાઇલ અપડેટ કરવામાં આવી', 'success');
-        closeModal('profileModal');
+    if(confirm('રીફ્રેશ કરવું છે?')) {
+        location.reload();
     }
 }
 
-// ====================
-// NAVIGATION FUNCTIONS
-// ====================
-function showChats() {
-    document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-    document.querySelectorAll('.nav-item')[0].classList.add('active');
-    showNotification('ચેટ્સ પૃષ્ઠ ખુલ્લું', 'info');
-}
-
-function showStatus() {
-    document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-    document.querySelectorAll('.nav-item')[1].classList.add('active');
-    alert('📢 સ્ટેટસ ફીચર\n\nઆ ફીચરમાં તમે:\n• 24 કલાક સુધી રહેતા સ્ટેટસ જોઈ શકો છો\n• તમારો સ્ટેટસ શેર કરી શકો છો\n• મિત્રોના સ્ટેટસ જોઈ શકો છો\n\nઆ ફીચર ટૂંક સમયમાં આવશે!');
-}
-
-function showCalls() {
-    document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-    document.querySelectorAll('.nav-item')[2].classList.add('active');
-    alert('📞 કૉલ્સ ફીચર\n\nઆ ફીચરમાં તમે:\n• કૉલ ઇતિહાસ જોઈ શકો છો\n• વોઇસ કૉલ કરી શકો છો\n• વીડિઓ કૉલ કરી શકો છો\n\nઆ ફીચર ટૂંક સમયમાં આવશે!');
-}
-
-// ====================
-// SEARCH FUNCTIONALITY
-// ====================
-function toggleSearch() {
-    const searchContainer = document.getElementById('searchContainer');
-    if (searchContainer.style.display === 'none' || searchContainer.style.display === '') {
-        searchContainer.style.display = 'block';
-        document.getElementById('searchInput').focus();
-    } else {
-        searchContainer.style.display = 'none';
-        document.getElementById('searchInput').value = '';
-        renderChatList();
+// ડેટા ક્લિયર
+function clearData() {
+    toggleDropdown();
+    if(confirm('બધો ડેટા ડીલીટ કરવો છે?')) {
+        localStorage.clear();
+        location.reload();
     }
 }
 
+// ચેટ બંધ
+function closeChat() {
+    document.getElementById('chatPanel').style.display = 'none';
+    document.getElementById('backBtn').style.display = 'none';
+    document.getElementById('messageInputContainer').style.display = 'none';
+    activeChatId = null;
+}
+
+// કી પ્રેસ
+function handleKeyPress(e) {
+    if(e.key === 'Enter') sendMsg();
+}
+
+// સર્ચ
 function filterChats() {
-    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+    const term = document.getElementById('searchInput').value.toLowerCase();
     const rows = document.querySelectorAll('.chat-row');
     
-    if (!searchTerm) {
-        rows.forEach(row => row.style.display = 'flex');
-        return;
-    }
-    
     rows.forEach(row => {
-        const name = row.querySelector('.chat-name').textContent.toLowerCase();
-        const preview = row.querySelector('.chat-preview').textContent.toLowerCase();
-        
-        if (name.includes(searchTerm) || preview.includes(searchTerm)) {
-            row.style.display = 'flex';
-        } else {
-            row.style.display = 'none';
-        }
+        const name = row.querySelector('b').textContent.toLowerCase();
+        row.style.display = name.includes(term) ? 'flex' : 'none';
     });
 }
 
-// ====================
-// EVENT HANDLERS
-// ====================
-function handleKeyPress(event) {
-    const sendBtn = document.getElementById('sendBtn');
-    
-    if (event.key === 'Enter') {
-        sendMsg();
-    } else {
-        // Enable send button if there's text
-        sendBtn.disabled = event.target.value.trim() === '';
-    }
+// સેવ
+function saveState() {
+    localStorage.setItem('wa_state', JSON.stringify(state));
 }
 
-function setupEventListeners() {
-    // Message input events
-    const msgInput = document.getElementById('msgInput');
-    if (msgInput) {
-        msgInput.addEventListener('input', function() {
-            document.getElementById('sendBtn').disabled = this.value.trim() === '';
-        });
-    }
-    
-    // Close dropdown when clicking outside
-    window.addEventListener('click', function(event) {
-        const dropdown = document.getElementById("dropdownMenu");
-        const menuIcon = document.querySelector('.fa-ellipsis-v');
-        
-        if (dropdown && dropdown.classList.contains('show') && 
-            !dropdown.contains(event.target) && 
-            event.target !== menuIcon) {
-            dropdown.classList.remove('show');
-        }
-        
-        // Close context menu
-        const contextMenu = document.getElementById('contextMenu');
-        if (contextMenu && contextMenu.style.display === 'block' && 
-            !contextMenu.contains(event.target)) {
-            contextMenu.style.display = 'none';
-        }
-    });
-    
-    // Handle window resize
-    window.addEventListener('resize', function() {
-        if (window.innerWidth > 900) {
-            document.getElementById('sidebar').classList.remove('hidden');
-            document.getElementById('chatPanel').classList.remove('active');
-            document.getElementById('backBtn').style.display = 'none';
-        }
-    });
-}
+// શરૂઆત
+window.onload = renderChatList;
 
-// ====================
-// CONTEXT MENU
-// ====================
-function showContactContextMenu(e, contactId) {
-    e.preventDefault();
-    
-    const contextMenu = document.getElementById('contextMenu');
-    contextMenu.innerHTML = `
-        <div class="context-menu-item" onclick="deleteContact(${contactId})">
-            <i class="fas fa-trash" style="color:#d32f2f;"></i>
-            <span>સંપર્ક ડીલીટ કરો</span>
-        </div>
-        <div class="context-menu-item" onclick="archiveChat(${contactId})">
-            <i class="fas fa-archive"></i>
-            <span>આર્કાઇવ કરો</span>
-        </div>
-        <div class="context-menu-item" onclick="muteChat(${contactId})">
-            <i class="fas fa-bell-slash"></i>
-            <span>મ્યૂટ કરો</span>
-        </div>
-        <div class="context-menu-item" onclick="viewContact(${contactId})">
-            <i class="fas fa-info-circle"></i>
-            <span>માહિતી જુઓ</span>
-        </div>
-    `;
-    
-    contextMenu.style.display = 'block';
-    contextMenu.style.left = e.pageX + 'px';
-    contextMenu.style.top = e.pageY + 'px';
-}
-
-function showMessageContextMenu(e, messageId) {
-    e.preventDefault();
-    
-    const contextMenu = document.getElementById('contextMenu');
-    contextMenu.style.display = 'block';
-    contextMenu.style.left = e.pageX + 'px';
-    contextMenu.style.top = e.pageY + 'px';
-}
-
-function deleteContact(contactId) {
-    if (confirm('શું તમે આ સંપર્ક ડીલીટ કરવા માંગો છો? આ ક્રિયા પૂર્વવત્ થઈ શકશે નહીં.')) {
-        state.contacts = state.contacts.filter(c => c.id !== contactId);
-        delete state.chats[contactId];
-        
-        if (activeChatId === contactId) {
-            closeChat();
-        }
-        
-        renderChatList();
-        saveState();
-        showNotification('સંપર્ક ડીલીટ કરવામાં આવ્યો', 'success');
-    }
-    
-    document.getElementById('contextMenu').style.display = 'none';
-}
-
-// ====================
-// ADDITIONAL FEATURES
-// ====================
-function makeCall() {
-    if (!activeChatId) return;
-    const contact = state.contacts.find(c => c.id === activeChatId);
-    showNotification(`${contact.name} ને કૉલ કરી રહ્યા છો...`, 'info');
-}
-
-function makeVideoCall() {
-    if (!activeChatId) return;
-    const contact = state.contacts.find(c => c.id === activeChatId);
-    showNotification(`${contact.name} ને વીડિઓ કૉલ કરી રહ્યા છો...`, 'info');
-}
-
-function showContactInfo() {
-    if (!activeChatId) return;
-    const contact = state.contacts.find(c => c.id === activeChatId);
-    alert(`📱 સંપર્ક માહિતી\n\nનામ: ${contact.name}\nફોન: ${contact.phone}\nસ્ટેટસ: ${contact.status}\nછેલ્લો મેસેજ: ${contact.lastMsg}`);
-}
-
-function logout() {
-    if (confirm('શું તમે લોગઆઉટ કરવા માંગો છો?')) {
-        showNotification('લોગઆઉટ કરી રહ્યા છો...', 'info');
-        setTimeout(() => {
-            localStorage.removeItem('whatsapp_pro_state');
-            location.reload();
-        }, 1000);
-    }
-}
-
-function clearData() {
-    if (confirm('⚠️ બધો ડેટા ક્લિયર કરવાની ખાતરી\n\nશું તમે બધો ડેટા ક્લિયર કરવા માંગો છો?\nબધા સંપર્કો અને મેસેજ કાયમી રીતે ડીલીટ થઈ જશે.\n\nઆ ક્રિયા પૂર્વવત્ થઈ શકશે નહીં.')) {
-        localStorage.clear();
-        showNotification('બધો ડેટા ક્લિયર કરવામાં આવ્યો', 'success');
-        setTimeout(() => location.reload(), 1500);
-    }
-}
-
-function showNewGroupModal() {
-    toggleDropdown();
-    const groupContacts = document.getElementById('groupContacts');
-    groupContacts.innerHTML = '';
-    
-    state.contacts.forEach(contact => {
-        const contactDiv = document.createElement('div');
-        contactDiv.style.display = 'flex';
-        contactDiv.style.alignItems = 'center';
-        contactDiv.style.marginBottom = '10px';
-        contactDiv.style.padding = '8px';
-        contactDiv.style.borderRadius = '6px';
-        contactDiv.style.border = '1px solid #eee';
-        
-        contactDiv.innerHTML = `
-            <input type="checkbox" id="contact_${contact.id}" style="margin-right:10px;" onchange="toggleGroupContact(${contact.id})">
-            <div class="avatar" style="width:35px; height:35px; font-size:14px; margin-right:10px;">${contact.avatar || contact.name[0]}</div>
-            <div>
-                <div style="font-weight:500;">${contact.name}</div>
-                <div style="font-size:12px; color:#666;">${contact.phone}</div>
-            </div>
-        `;
-        
-        groupContacts.appendChild(contactDiv);
-    });
-    
-    document.getElementById('groupModal').style.display = 'flex';
-}
-
-function toggleGroupContact(contactId) {
-    const index = selectedContactIds.indexOf(contactId);
-    if (index === -1) {
-        selectedContactIds.push(contactId);
-    } else {
-        selectedContactIds.splice(index, 1);
-    }
-}
-
-function createGroup() {
-    const groupName = document.getElementById('groupName').value.trim();
-    
-    if (!groupName) {
-        showNotification('ગ્રુપનું નામ દાખલ કરો', 'error');
-        return;
-    }
-    
-    if (selectedContactIds.length < 2) {
-        showNotification('ઓછામાં ઓછા 2 સંપર્કો પસંદ કરો', 'error');
-        return;
-    }
-    
-    const groupId = Date.now();
-    const groupContact = {
-        id: groupId,
-        name: groupName,
-        phone: 'ગ્રુપ',
-        lastMsg: 'તમે આ ગ્રુપમાં જોડાયા છો',
-        lastTime: getCurrentTime(),
-        status: 'group',
-        unread: 0,
-        avatar: '👥'
-    };
-    
-    state.contacts.push(groupContact);
-    state.chats[groupId] = [{
-        id: 1,
-        from: 'them',
-        text: `તમે "${groupName}" ગ્રુપમાં જોડાયા છો. ગ્રુપમાં ${selectedContactIds.length} સભ્યો છે.`,
-        time: getCurrentTime()
-    }];
-    
-    selectedContactIds = [];
-    closeModal('groupModal');
-    renderChatList();
-    saveState();
-    showNotification(`"${groupName}" ગ્રુપ બનાવવામાં આવ્યું`, 'success');
-}
-
-function showArchivedChats() {
-    toggleDropdown();
-    if (state.archived.length === 0) {
-        alert('📁 આર્કાઇવ્ડ ચેટ્સ\n\nતમારી પાસે હાલમાં કોઈ આર્કાઇવ્ડ ચેટ્સ નથી.');
-    } else {
-        alert(`📁 આર્કાઇવ્ડ ચેટ્સ\n\nતમારી પાસે ${state.archived.length} આર્કાઇવ્ડ ચેટ્સ છે.`);
-    }
-}
-
-function showStarredMessages() {
-    toggleDropdown();
-    if (state.starred.length === 0) {
-        alert('⭐ સ્ટાર કરેલા મેસેજ\n\nતમારી પાસે હાલમાં કોઈ સ્ટાર કરેલા મેસેજ નથી.');
-    } else {
-        alert(`⭐ સ્ટાર કરેલા મેસેજ\n\nતમારી પાસે ${state.starred.length} સ્ટાર કરેલા મેસેજ છે.`);
-    }
-}
-
-// ====================
-// INITIALIZE APP
-// ====================
-window.onload = function() {
-    initializeApp();
-    
-    // Add sample data button for testing
-    const testButton = document.createElement('button');
-    testButton.innerHTML = '🧪 ટેસ્ટ ડેટા લોડ કરો';
-    testButton.style.position = 'fixed';
-    testButton.style.top = '10px';
-    testButton.style.left = '10px';
-    testButton.style.zIndex = '1000';
-    testButton.style.padding = '8px 15px';
-    testButton.style.background = '#667eea';
-    testButton.style.color = 'white';
-    testButton.style.border = 'none';
-    testButton.style.borderRadius = '20px';
-    testButton.style.cursor = 'pointer';
-    testButton.style.fontSize = '12px';
-    testButton.style.display = 'none'; // Hidden by default
-    testButton.onclick = function() {
-        if (confirm('ટેસ્ટ ડેટા લોડ કરવા માંગો છો? તમારો હાલનો ડેટા રિપ્લેસ થઈ જશે.')) {
-            loadSampleData();
-            location.reload();
-        }
-    };
-    document.body.appendChild(testButton);
-    
-    // Show test button in development
-    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-        testButton.style.display = 'block';
+// વિન્ડો ક્લિક
+window.onclick = function(e) {
+    if (!e.target.matches('.header span')) {
+        document.getElementById("dropdownMenu").style.display = "none";
     }
 };
-    <script>
-// ====================
-// મેસેજ સ્ટેટસ સિસ્ટમ
-// ====================
 
-// મેસેજ સ્ટેટસ ટાઈપ્સ
-const MessageStatus = {
-    SENT: 'sent',      // મોકલાયો ✓
-    DELIVERED: 'delivered', // પહોંચ્યો ✓✓ (ગ્રે)
-    READ: 'read'       // વાંચ્યો ✓✓ (વાદળી)
-};
-
-// મેસેજ મોકલતી વખતે
-function sendMsg() {
-    const input = document.getElementById('msgInput');
-    const text = input.value.trim();
-    
-    if (!text || !activeChatId) return;
-    
-    // Create message object with initial status
-    messageIdCounter++;
-    const time = getCurrentTime();
-    const message = {
-        id: messageIdCounter,
-        from: 'me',
-        text: text,
-        time: time,
-        status: MessageStatus.SENT, // પહેલા માત્ર sent
-        timestamp: Date.now()
-    };
-    
-    // Add to chat
-    if (!state.chats[activeChatId]) {
-        state.chats[activeChatId] = [];
-    }
-    state.chats[activeChatId].push(message);
-    
-    // Update contact's last message
-    const contact = state.contacts.find(c => c.id === activeChatId);
-    if (contact) {
-        contact.lastMsg = text;
-        contact.lastTime = time;
-        contact.lastMessageId = messageIdCounter;
-    }
-    
-    // Clear input
-    input.value = '';
-    document.getElementById('sendBtn').disabled = true;
-    
-    // Render messages
-    renderMessages();
-    renderChatList();
-    saveState();
-    
-    // Show sent notification
-    if (state.settings.notifications) {
-        showNotification('મેસેજ મોકલાયો', 'info');
-    }
-    
-    // Simulate delivery after 1-2 seconds
-    setTimeout(() => {
-        updateMessageStatus(messageIdCounter, MessageStatus.DELIVERED);
-    }, 1000 + Math.random() * 1000);
-    
-    // Auto-reply for bot contacts
-    if (contact && contact.name.includes('બોટ')) {
-        setTimeout(() => {
-            autoReply(text, contact.id, messageIdCounter);
-        }, 2000 + Math.random() * 2000);
-    }
+// શો એડ મોડલ
+function showAddContactModal() {
+    document.getElementById('addModal').style.display = 'flex';
 }
-
-// મેસેજ સ્ટેટસ અપડેટ કરવું
-function updateMessageStatus(messageId, newStatus) {
-    if (!activeChatId || !state.chats[activeChatId]) return;
-    
-    const messageIndex = state.chats[activeChatId].findIndex(m => m.id === messageId);
-    if (messageIndex === -1) return;
-    
-    state.chats[activeChatId][messageIndex].status = newStatus;
-    
-    // Update display if this chat is active
-    if (activeChatId) {
-        renderMessages();
-    }
-    
-    // Show notification for read status
-    if (newStatus === MessageStatus.READ) {
-        const contact = state.contacts.find(c => c.id === activeChatId);
-        if (contact && state.settings.notifications) {
-            showNotification(`${contact.name} એ મેસેજ વાંચ્યો`, 'info');
-        }
-    }
-    
-    saveState();
-}
-
-// બોટ જવાબ આપે ત્યારે
-function autoReply(userMessage, contactId, originalMessageId) {
-    const replies = {
-        'હાય': 'હાય! તમે કેમ છો?',
-        'હેલો': 'હેલો! હું WhatsApp Pro બોટ છું.',
-        'કેમ છો': 'હું મજામાં છું! તમે કેમ છો?',
-        'નામ': 'મારું નામ વિધુષી બોટ છે.',
-        'સમય': `હમણાં સમય છે: ${getCurrentTime()}`,
-        'જય શ્રી કૃષ્ણ': 'જય શ્રી કૃષ્ણ! હરિ ભજનમાં સ્વાગત છે.',
-        'આભાર': 'તમારું સ્વાગત છે!',
-        'બાય': 'બાય! ફરી મળીશું.',
-        'સુપ્રભાત': 'સુપ્રભાત! શુભ પ્રભાત.',
-        'શુભ રાત્રી': 'શુભ રાત્રી, સુખદ સ્વપ્નાં.'
-    };
-    
-    const msg = userMessage.toLowerCase();
-    let reply = 'સમજાયું!';
-    
-    for (const [key, value] of Object.entries(replies)) {
-        if (msg.includes(key.toLowerCase())) {
-            reply = value;
-            break;
-        }
-    }
-    
-    // Mark original message as READ when bot sees it
-    setTimeout(() => {
-        updateMessageStatus(originalMessageId, MessageStatus.READ);
-    }, 500);
-    
-    // Add typing indicator
-    showTypingIndicator(contactId);
-    
-    // Send reply after delay
-    setTimeout(() => {
-        messageIdCounter++;
-        const time = getCurrentTime();
-        const botMessage = {
-            id: messageIdCounter,
-            from: 'them',
-            text: reply,
-            time: time,
-            timestamp: Date.now()
-        };
-        
-        if (!state.chats[contactId]) {
-            state.chats[contactId] = [];
-        }
-        state.chats[contactId].push(botMessage);
-        
-        // Update contact
-        const contact = state.contacts.find(c => c.id === contactId);
-        if (contact) {
-            contact.lastMsg = reply;
-            contact.lastTime = time;
-            contact.unread = (contact.unread || 0) + 1;
-        }
-        
-        // Render updates
-        if (activeChatId === contactId) {
-            renderMessages();
-        }
-        renderChatList();
-        saveState();
-    }, 1500);
-}
-
-// મેસેજ રેન્ડર કરતી વખતે સ્ટેટસ દર્શાવવી
-function getStatusIcon(status) {
-    switch(status) {
-        case MessageStatus.SENT:
-            return '<span class="message-status" style="color:#888;">✓</span>';
-        case MessageStatus.DELIVERED:
-            return '<span class="message-status" style="color:#888;">✓✓</span>';
-        case MessageStatus.READ:
-            return '<span class="message-status" style="color:#34B7F1;">✓✓</span>';
-        default:
-            return '<span class="message-status" style="color:#888;">✓</span>';
-    }
-}
-
-// મેસેજ રેન્ડર કરવા માટે અપડેટેડ ફંક્શન
-function renderMessages() {
-    const body = document.getElementById('chatBody');
-    
-    // Hide welcome screen
-    const welcomeScreen = document.getElementById('welcomeScreen');
-    if (welcomeScreen) {
-        welcomeScreen.style.display = 'none';
-    }
-    
-    if (!activeChatId || !state.chats[activeChatId] || state.chats[activeChatId].length === 0) {
-        body.innerHTML = `
-            <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:20px;">
-                <div class="avatar" style="width:80px; height:80px; margin-bottom:15px; font-size:30px;">
-                    ${state.contacts.find(c => c.id === activeChatId)?.avatar || state.contacts.find(c => c.id === activeChatId)?.name[0] || '?'}
-                </div>
-                <h3 style="color:#075E54; margin-bottom:10px;">
-                    ${state.contacts.find(c => c.id === activeChatId)?.name || 'અજાણ્યા'}
-                </h3>
-                <p style="color:#666; max-width:300px; margin-bottom:20px;">
-                    તમે અને ${state.contacts.find(c => c.id === activeChatId)?.name || 'અજાણ્યા'} વચ્ચે હજી કોઈ મેસેજ નથી.
-                </p>
-                <p style="color:#888; font-size:14px;">
-                    હેલો મેસેજ મોકલીને ચેટ શરૂ કરો!
-                </p>
-            </div>
-        `;
-        return;
-    }
-    
-    body.innerHTML = '';
-    
-    const messages = state.chats[activeChatId];
-    let lastDate = null;
-    
-    messages.forEach(msg => {
-        // Add date separator if date changed
-        const msgDate = new Date(msg.timestamp || Date.now()).toDateString();
-        if (msgDate !== lastDate) {
-            const dateSeparator = document.createElement('div');
-            dateSeparator.style.textAlign = 'center';
-            dateSeparator.style.margin = '15px 0';
-            dateSeparator.style.padding = '5px 15px';
-            dateSeparator.style.color = '#666';
-            dateSeparator.style.fontSize = '12px';
-            dateSeparator.style.background = 'rgba(255,255,255,0.7)';
-            dateSeparator.style.borderRadius = '12px';
-            dateSeparator.style.display = 'inline-block';
-            dateSeparator.style.alignSelf = 'center';
-            
-            const date = new Date(msg.timestamp || Date.now());
-            const today = new Date();
-            const yesterday = new Date(today);
-            yesterday.setDate(yesterday.getDate() - 1);
-            
-            let dateText = '';
-            if (date.toDateString() === today.toDateString()) {
-                dateText = 'આજે';
-            } else if (date.toDateString() === yesterday.toDateString()) {
-                dateText = 'ગઇકાલે';
-            } else {
-                dateText = date.toLocaleDateString('gu-IN', { 
-                    day: 'numeric', 
-                    month: 'short',
-                    year: 'numeric'
-                });
-            }
-            
-            dateSeparator.textContent = dateText;
-            body.appendChild(dateSeparator);
-            lastDate = msgDate;
-        }
-        
-        const bubble = document.createElement('div');
-        bubble.className = `bubble ${msg.from}`;
-        bubble.oncontextmenu = (e) => {
-            e.preventDefault();
-            showMessageContextMenu(e, msg.id);
-        };
-        
-        // Get status icon for my messages
-        let statusIcon = '';
-        if (msg.from === 'me') {
-            statusIcon = getStatusIcon(msg.status || MessageStatus.SENT);
-        }
-        
-        const timeWithStatus = msg.from === 'me' ? 
-            `${msg.time} ${statusIcon}` : 
-            msg.time;
-        
-        bubble.innerHTML = `
-            <div>${msg.text}</div>
-            <div class="m-time">${timeWithStatus}</div>
-        `;
-        
-        body.appendChild(bubble);
-    });
-    
-    // Scroll to bottom
-    body.scrollTop = body.scrollHeight;
-    
-    // Mark all messages as read when user opens chat
-    markMessagesAsRead();
-}
-
-// જ્યારે યુઝર ચેટ ખોલે ત્યારે બધા મેસેજ read માર્ક કરવા
-function markMessagesAsRead() {
-    if (!activeChatId || !state.chats[activeChatId]) return;
-    
-    let updated = false;
-    const messages = state.chats[activeChatId];
-    
-    messages.forEach(msg => {
-        if (msg.from === 'them' && (!msg.read || msg.read === false)) {
-            msg.read = true;
-            updated = true;
-        }
-        
-        // Mark my messages as read by recipient if they're online
-        if (msg.from === 'me' && msg.status === MessageStatus.DELIVERED) {
-            const contact = state.contacts.find(c => c.id === activeChatId);
-            if (contact && contact.status === 'online') {
-                // Simulate recipient reading the message
-                setTimeout(() => {
-                    updateMessageStatus(msg.id, MessageStatus.READ);
-                }, 500 + Math.random() * 1000);
-            }
-        }
-    });
-    
-    if (updated) {
-        saveState();
-    }
-}
-
-// સંપર્ક ખોલતી વખતે યુનરીડ મેસેજ રીસેટ
-function openChat(chatId) {
-    activeChatId = chatId;
-    const contact = state.contacts.find(c => c.id === chatId);
-    
-    if (!contact) return;
-    
-    // Update header
-    document.getElementById('chatName').textContent = contact.name;
-    document.getElementById('chatNum').textContent = contact.phone;
-    document.getElementById('chatAvatar').textContent = contact.avatar || contact.name[0];
-    
-    // Update status
-    let statusText = '';
-    if (contact.status === 'online') {
-        statusText = '<div class="online-dot"></div> ઓનલાઇન';
-        
-        // Mark all delivered messages as read (since contact is online and viewing chat)
-        setTimeout(() => {
-            if (state.chats[chatId]) {
-                state.chats[chatId].forEach(msg => {
-                    if (msg.from === 'me' && msg.status === MessageStatus.DELIVERED) {
-                        updateMessageStatus(msg.id, MessageStatus.READ);
-                    }
-                });
-            }
-        }, 800);
-        
-    } else if (contact.status === 'lastSeen') {
-        statusText = `🕐 છેલ્લો જોયેલ ${contact.lastTime}`;
-    } else {
-        statusText = '⚫ ઑફલાઇન';
-    }
-    document.getElementById('chatStatus').innerHTML = statusText;
-    
-    // Reset unread count
-    const previousUnread = contact.unread || 0;
-    contact.unread = 0;
-    
-    // Show typing indicator for bot
-    if (contact.name.includes('બોટ') && previousUnread > 0) {
-        setTimeout(() => {
-            showTypingIndicator(chatId);
-        }, 500);
-    }
-    
-    // Mobile view handling
-    if (window.innerWidth <= 900) {
-        document.getElementById('sidebar').classList.add('hidden');
-        document.getElementById('chatPanel').classList.add('active');
-        document.getElementById('backBtn').style.display = 'block';
-    }
-    
-    // Show message input
-    document.getElementById('messageInputContainer').style.display = 'flex';
-    document.getElementById('msgInput').focus();
-    
-    // Hide welcome screen
-    document.getElementById('welcomeScreen').style.display = 'none';
-    
-    // Render messages
-    renderMessages();
-    
-    // Update chat list
-    renderChatList();
-    
-    // Save state
-    saveState();
-}
-
-// ====================
-// REALISTIC STATUS UPDATES
-// ====================
-
-// સંપર્કોનો સ્ટેટસ રેન્ડમલી અપડેટ કરવો
-function updateRandomStatus() {
-    if (!state.contacts || state.contacts.length === 0) return;
-    
-    state.contacts.forEach(contact => {
-        if (contact.id === activeChatId) return; // Don't change active chat status
-        
-        // Random status changes
-        const random = Math.random();
-        if (random < 0.3) { // 30% chance to change status
-            if (contact.status === 'online') {
-                contact.status = 'lastSeen';
-                contact.lastTime = getCurrentTime();
-            } else if (contact.status === 'lastSeen') {
-                contact.status = Math.random() > 0.5 ? 'online' : 'offline';
-            } else if (contact.status === 'offline') {
-                contact.status = Math.random() > 0.7 ? 'online' : 'lastSeen';
-                contact.lastTime = getCurrentTime();
-            }
-            
-            // Update last seen time
-            if (contact.status === 'lastSeen') {
-                contact.lastTime = getCurrentTime();
-            }
-        }
-    });
-    
-    // Update display if any contact list is visible
-    renderChatList();
-    saveState();
-}
-
-// મેસેજ વાંચ્યાનો સિમ્યુલેશન
-function simulateMessageReading() {
-    if (!activeChatId || !state.chats[activeChatId]) return;
-    
-    const contact = state.contacts.find(c => c.id === activeChatId);
-    if (!contact || contact.status !== 'online') return;
-    
-    // Find undelivered messages from me
-    const myMessages = state.chats[activeChatId].filter(msg => 
-        msg.from === 'me' && 
-        msg.status === MessageStatus.DELIVERED
-    );
-    
-    if (myMessages.length > 0) {
-        // Randomly mark one as read
-        const randomMsg = myMessages[Math.floor(Math.random() * myMessages.length)];
-        setTimeout(() => {
-            updateMessageStatus(randomMsg.id, MessageStatus.READ);
-        }, 500 + Math.random() * 2000);
-    }
-}
-
-// ====================
-// INITIALIZATION
-// ====================
-function initializeApp() {
-    // Load initial sample data if empty
-    if (state.contacts.length === 0) {
-        loadSampleData();
-    }
-    
-    // Apply settings
-    applySettings();
-    
-    // Render UI
-    renderChatList();
-    updateDataCount();
-    
-    // Set up event listeners
-    setupEventListeners();
-    
-    // Start status update intervals
-    setInterval(updateRandomStatus, 30000); // Update status every 30 seconds
-    setInterval(simulateMessageReading, 10000); // Check for message reading every 10 seconds
-    
-    // Show welcome message
-    console.log('WhatsApp Pro v3.1 initialized with realistic message status!');
-    console.log('✓ = મોકલાયો');
-    console.log('✓✓ (ગ્રે) = પહોંચ્યો');
-    console.log('✓✓ (વાદળી) = વાંચ્યો');
-}
-
-// ====================
-// ENHANCED SAMPLE DATA
-// ====================
-function loadSampleData() {
-    state.contacts = [
-        {
-            id: 1,
-            name: "વિધુષી બોટ",
-            phone: "98765 43210",
-            lastMsg: "હેલો! હું WhatsApp Pro બોટ છું.",
-            lastTime: getCurrentTime(),
-            status: "online",
-            unread: 3,
-            avatar: "V"
-        },
-        {
-            id: 2,
-            name: "રમેશભાઈ",
-            phone: "98765 43211",
-            lastMsg: "મીટિંગ માટે થેંક્યુ",
-            lastTime: "10:30 AM",
-            status: "lastSeen",
-            unread: 2,
-            avatar: "R"
-        },
-        {
-            id: 3,
-            name: "સીતાબેન",
-            phone: "98765 43212",
-            lastMsg: "કાલે મળીશું",
-            lastTime: "ગઈકાલે",
-            status: "offline",
-            unread: 1,
-            avatar: "S"
-        }
-    ];
-
-    state.chats = {
-        1: [
-            { 
-                id: 1, 
-                from: 'them', 
-                text: 'હેલો! હું WhatsApp Pro બોટ છું.', 
-                time: '10:00 AM',
-                timestamp: Date.now() - 3600000,
-                read: true
-            },
-            { 
-                id: 2, 
-                from: 'me', 
-                text: 'હેલો! કેમ છો?', 
-                time: '10:01 AM',
-                timestamp: Date.now() - 3540000,
-                status: MessageStatus.READ
-            },
-            { 
-                id: 3, 
-                from: 'them', 
-                text: 'હું મજામાં છું! તમને કેવી મદદ કરી શકું?', 
-                time: '10:02 AM',
-                timestamp: Date.now() - 3480000,
-                read: true
-            }
-        ],
-        2: [
-            { 
-                id: 4, 
-                from: 'them', 
-                text: 'કાલની મીટિંગ માટે થેંક્યુ', 
-                time: 'ગઈકાલે 3:45 PM',
-                timestamp: Date.now() - 86400000,
-                read: true
-            },
-            { 
-                id: 5, 
-                from: 'me', 
-                text: 'તમારું સ્વાગત છે! મીટિંગ શી હતી?', 
-                time: 'આજે 10:15 AM',
-                timestamp: Date.now() - 3600000,
-                status: MessageStatus.DELIVERED
-            }
-        ]
-    };
-
-    saveState();
-
 </script>
 </body>
 </html>
